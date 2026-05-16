@@ -1,19 +1,48 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { register, login } from "../services/api";
 
 export default function SignInPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isSignIn, setIsSignIn] = useState(location.pathname === "/signin");
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [isSignIn, setIsSignIn] = useState(location.pathname === '/signin')
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" })
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  // Form state
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: hubungkan ke Express backend
-    console.log(isSignIn ? "Sign In" : "Register", form);
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+
+  const handleSubmit = async () => {
+    setError("")
+    setLoading(true)
+
+    try {
+      if (isSignIn) {
+        // ── Login ──
+        const res = await login({ email: form.email, password: form.password })
+        localStorage.setItem('token', res.data.token)
+        localStorage.setItem('user', JSON.stringify(res.data.user))
+        navigate('/dashboard')
+
+      } else {
+        // ── Register ──
+        if (form.password !== form.confirm) {
+          setError("Passwords do not match")
+          setLoading(false)
+          return
+        }
+        await register({ name: form.name, email: form.email, password: form.password })
+        // Setelah register, langsung arahkan ke sign in
+        setIsSignIn(true)
+        setForm({ name: "", email: "", password: "", confirm: "" })
+      }
+
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -141,12 +170,19 @@ export default function SignInPage() {
               </label>
             )}
 
+            {error && (
+              <div className="alert alert-error text-sm py-2">
+                <span>{error}</span>
+              </div>
+            )}
+
             {/* Submit */}
-            <button
+             <button
               className="btn btn-primary w-full mt-2"
               onClick={handleSubmit}
+              disabled={loading}
             >
-              {isSignIn ? "Sign In" : "Create Account"}
+              {loading ? <span className="loading loading-spinner loading-sm" /> : isSignIn ? "Sign In" : "Create Account"}
             </button>
           </div>
 
