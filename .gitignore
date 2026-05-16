@@ -13,3 +13,6 @@ AI/logs/
 # AI/saved_model/*.keras
 # AI/saved_model/*.pkl
 # AI/data/raw/*.csv
+
+# Context info
+CONTEXT.md
