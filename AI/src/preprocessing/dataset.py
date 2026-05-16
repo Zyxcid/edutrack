@@ -42,7 +42,7 @@ def preprocess_data(data):
         ])
 
     X_processed = preprocessor.fit_transform(X)
-    y_processed = y.fillna(y.median()).values
+    y_processed = y.fillna(y.median()).values / 100.0
     
     os.makedirs('saved_model', exist_ok=True)
     joblib.dump(preprocessor, 'saved_model/preprocessor.pkl')

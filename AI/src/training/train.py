@@ -4,28 +4,28 @@ from src.custom.layers import CustomDenseBlock
 def build_model(input_shape):
     """
     Build the architecture of the AI model using TF Functional API.
-    Since this is a Regression task, the output layer has 1 node and linear activation.
+    Deep and wide architecture to catch any deterministic dataset formula for MAE <= 0.02
     """
     inputs = tf.keras.Input(shape=input_shape)
     
-    # Custom components usage
-    x = CustomDenseBlock(64, activation='relu')(inputs)
+    x = CustomDenseBlock(256, activation='relu')(inputs)
+    x = CustomDenseBlock(128, activation='relu')(x)
+    x = CustomDenseBlock(64, activation='relu')(x)
     x = CustomDenseBlock(32, activation='relu')(x)
+    x = tf.keras.layers.Dense(16, activation='relu')(x)
     
-    # Final layer for Regression
     outputs = tf.keras.layers.Dense(1, activation='linear')(x)
     
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name='Regression_Model')
     
-    # Compile model with standard regression metrics
     model.compile(
-        optimizer='adam',
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
         loss='mse',
         metrics=['mae', 'mse']
     )
     return model
 
-def train_model(model, train_data, val_data, epochs=10, callbacks=None):
+def train_model(model, train_data, val_data, epochs=300, callbacks=None):
     """
     Train the machine learning model.
     """

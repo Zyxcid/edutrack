@@ -24,9 +24,10 @@ def main():
     
     print("--- Training Model ---")
     custom_callback = TrainingMonitorCallback()
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=30, restore_best_weights=True)
+    lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_mae', factor=0.5, patience=10, min_lr=1e-5)
     
-    history = train_model(model, train_ds, val_ds, epochs=10, callbacks=[custom_callback, early_stop])
+    history = train_model(model, train_ds, val_ds, epochs=300, callbacks=[custom_callback, early_stop, lr_reducer])
     
     print("--- Evaluating Model ---")
     results = evaluate_model(model, test_ds)

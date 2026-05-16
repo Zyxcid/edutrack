@@ -1,21 +1,28 @@
 import tensorflow as tf
-import numpy as np
+import pandas as pd
+import joblib
 
-def load_saved_model(path="saved_model/model.keras"):
+def load_inference_components(model_path="saved_model/model.keras", preprocessor_path="saved_model/preprocessor.pkl"):
     """
-    Load a pre-trained model for inference.
+    Load pre-trained model and scikit-learn preprocessor.
     """
-    return tf.keras.models.load_model(path)
+    model = tf.keras.models.load_model(model_path)
+    preprocessor = joblib.load(preprocessor_path)
+    return model, preprocessor
 
-def preprocess_input(raw_input):
+def preprocess_input(input_dict, preprocessor):
     """
-    Preprocess user/API raw input into model-ready tensor.
+    Preprocess raw dict input into model-ready tensor.
     """
-    pass
+    df = pd.DataFrame([input_dict])
+    processed_array = preprocessor.transform(df)
+    return processed_array
 
 def predict(model, processed_input):
     """
-    Perform a prediction and return formatted output.
+    Perform a prediction and return human-readable score.
     """
-    predictions = model.predict(processed_input)
-    return predictions
+    predictions = model.predict(processed_input, verbose=0)
+    # Re-scale back to real score (since we divided by 100 during training)
+    final_score = predictions[0][0] * 100.0
+    return float(final_score)
