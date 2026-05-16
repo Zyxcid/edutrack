@@ -1,3 +1,22 @@
+# Virtual Environment
+AI/venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+AI/logs/
+
+# Optional: Large models and datasets (uncomment if want to ignore)
+# AI/saved_model/*.keras
+# AI/saved_model/*.pkl
+# AI/data/raw/*.csv
+
+# Context info
+CONTEXT.md
+
 node_modules
 .env
 dist
