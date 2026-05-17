@@ -1,9 +1,6 @@
 import tensorflow as tf
 
 class CustomDenseBlock(tf.keras.layers.Layer):
-    """
-    Custom Component: A reusable Dense block with Batch Normalization.
-    """
     def __init__(self, units, activation='relu', **kwargs):
         super(CustomDenseBlock, self).__init__(**kwargs)
         self.dense = tf.keras.layers.Dense(units, activation=activation)

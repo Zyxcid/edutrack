@@ -37,6 +37,7 @@ def main():
     
     print("--- Saving Model ---")
     save_trained_model(model, "saved_model/model.keras")
+    save_trained_model(model, "saved_model/model.h5")
 
 if __name__ == "__main__":
     main()
