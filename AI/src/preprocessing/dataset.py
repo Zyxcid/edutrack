@@ -19,8 +19,8 @@ def clean_data(data):
 
 def preprocess_data(data):
     """Normalize, encode, or transform data."""
-    X = data.drop('Exam_Score', axis=1)
-    y = data['Exam_Score']
+    X = data.drop('Academic_Readiness', axis=1)
+    y = data['Academic_Readiness']
     
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object']).columns
@@ -37,12 +37,12 @@ def preprocess_data(data):
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numeric_transformer, numeric_features),
-            ('cat', categorical_transformer, categorical_features)
+            ('num', numeric_transformer, list(numeric_features)),
+            ('cat', categorical_transformer, list(categorical_features))
         ])
 
     X_processed = preprocessor.fit_transform(X)
-    y_processed = y.fillna(y.median()).values / 100.0
+    y_processed = y.fillna(y.median()).values
     
     os.makedirs('saved_model', exist_ok=True)
     joblib.dump(preprocessor, 'saved_model/preprocessor.pkl')

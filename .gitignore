@@ -7,7 +7,7 @@ __pycache__/
 *$py.class
 
 # Logs
-AI/logs/
+# AI/logs/
 
 # Optional: Large models and datasets (uncomment if want to ignore)
 # AI/saved_model/*.keras

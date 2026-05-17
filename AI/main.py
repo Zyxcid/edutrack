@@ -7,7 +7,7 @@ from src.callbacks.callbacks import TrainingMonitorCallback
 
 def main():
     print("--- Loading and Preprocessing Data ---")
-    data = load_data('data/raw/dataset.csv')
+    data = load_data('../student_performance_dataset.csv')
     (X_train, y_train), (X_val, y_val), (X_test, y_test) = preprocess_data(data)
     
     print(f"Train shapes: {X_train.shape}, {y_train.shape}")
@@ -23,15 +23,17 @@ def main():
     model.summary()
     
     print("--- Training Model ---")
+    os.makedirs('logs', exist_ok=True)
+    csv_logger = tf.keras.callbacks.CSVLogger('logs/training_log.csv', append=False)
     custom_callback = TrainingMonitorCallback()
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=30, restore_best_weights=True)
     lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_mae', factor=0.5, patience=10, min_lr=1e-5)
     
-    history = train_model(model, train_ds, val_ds, epochs=300, callbacks=[custom_callback, early_stop, lr_reducer])
+    history = train_model(model, train_ds, val_ds, epochs=300, callbacks=[custom_callback, early_stop, lr_reducer, csv_logger])
     
     print("--- Evaluating Model ---")
     results = evaluate_model(model, test_ds)
-    print(f"Test Evaluation Results [Loss, MAE, MSE]: {results}")
+    print(f"Test Evaluation Results [Loss, MAE, MSE, Accuracy]: {results}")
     
     print("--- Saving Model ---")
     save_trained_model(model, "saved_model/model.keras")

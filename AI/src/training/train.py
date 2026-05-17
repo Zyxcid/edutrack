@@ -1,6 +1,17 @@
 import tensorflow as tf
 from src.custom.layers import CustomDenseBlock
 
+def accuracy(y_true, y_pred):
+    """
+    Custom accuracy for regression.
+    Since target is normalized to 0-1, MAE of 0.02 means 2% error.
+    Accuracy = 1.0 - MAE
+    """
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    y_true = tf.reshape(y_true, tf.shape(y_pred))
+    return 1.0 - tf.math.reduce_mean(tf.abs(y_true - y_pred))
+
 def build_model(input_shape):
     """
     Build the architecture of the AI model using TF Functional API.
@@ -21,7 +32,7 @@ def build_model(input_shape):
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
         loss='mse',
-        metrics=['mae', 'mse']
+        metrics=['mae', 'mse', accuracy]
     )
     return model
 
