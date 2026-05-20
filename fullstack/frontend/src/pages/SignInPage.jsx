@@ -14,29 +14,50 @@ export default function SignInPage() {
 
   const handleSubmit = async () => {
     setError("")
+
+    // ── Validasi Frontend ──
+    if (isSignIn) {
+      if (!form.email || !form.password) {
+        setError("Email and password are required")
+        return
+      }
+    } else {
+      if (!form.name || !form.email || !form.password || !form.confirm) {
+        setError("All fields are required")
+        return
+      }
+      if (form.name.trim().length < 2) {
+        setError("Name must be at least 2 characters")
+        return
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(form.email)) {
+        setError("Invalid email format")
+        return
+      }
+      if (form.password.length < 8) {
+        setError("Password must be at least 8 characters")
+        return
+      }
+      if (form.password !== form.confirm) {
+        setError("Passwords do not match")
+        return
+      }
+    }
+
     setLoading(true)
 
     try {
       if (isSignIn) {
-        // ── Login ──
         const res = await login({ email: form.email, password: form.password })
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('user', JSON.stringify(res.data.user))
         navigate('/dashboard')
-
       } else {
-        // ── Register ──
-        if (form.password !== form.confirm) {
-          setError("Passwords do not match")
-          setLoading(false)
-          return
-        }
         await register({ name: form.name, email: form.email, password: form.password })
-        // Setelah register, langsung arahkan ke sign in
         setIsSignIn(true)
         setForm({ name: "", email: "", password: "", confirm: "" })
       }
-
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong")
     } finally {
