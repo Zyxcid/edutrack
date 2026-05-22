@@ -47,7 +47,7 @@ def preprocess_data(data):
     os.makedirs('saved_model', exist_ok=True)
     joblib.dump(preprocessor, 'saved_model/preprocessor.pkl')
     
-    X_train, X_temp, y_train, y_temp = train_test_split(X_processed, y_processed, test_size=0.3, random_state=42)
+    X_train, X_temp, y_train, y_temp = train_test_split(X_processed, y_processed, test_size=0.2, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
     
     return (X_train, y_train), (X_val, y_val), (X_test, y_test)
