@@ -6,7 +6,7 @@ def load_inference_components(model_path="saved_model/model.keras", preprocessor
     """
     Load pre-trained model and scikit-learn preprocessor.
     """
-    model = tf.keras.models.load_model(model_path)
+    model = tf.keras.models.load_model(model_path, compile=False)
     preprocessor = joblib.load(preprocessor_path)
     return model, preprocessor
 
@@ -90,6 +90,28 @@ def preprocess_input(input_dict, preprocessor):
     """
     df = pd.DataFrame([input_dict])
     df = add_derived_features(df)
+    
+    # Map raw string features to their numeric encodings since the preprocessor expects them as numeric features
+    mappings = {
+        'Parental_Involvement': {'Low': 0, 'Medium': 1, 'High': 2},
+        'Access_to_Resources': {'Low': 0, 'Medium': 1, 'High': 2},
+        'Extracurricular_Activities': {'No': 0, 'Yes': 1},
+        'Motivation_Level': {'Low': 0, 'Medium': 1, 'High': 2},
+        'Internet_Access': {'No': 0, 'Yes': 1},
+        'Family_Income': {'Low': 0, 'Medium': 1, 'High': 2},
+        'Teacher_Quality': {'Low': 0, 'Medium': 1, 'High': 2},
+        'School_Type': {'Public': 0, 'Private': 1},
+        'Peer_Influence': {'Negative': 0, 'Neutral': 1, 'Positive': 2},
+        'Learning_Disabilities': {'No': 0, 'Yes': 1},
+        'Parental_Education_Level': {'High School': 0, 'College': 1, 'Postgraduate': 2},
+        'Distance_from_Home': {'Near': 0, 'Moderate': 1, 'Far': 2},
+        'Gender': {'Male': 0, 'Female': 1}
+    }
+    
+    for col, mapping in mappings.items():
+        if col in df.columns:
+            df[col] = df[col].apply(lambda v: _map_with_default(v, mapping, 0))
+            
     processed_array = preprocessor.transform(df)
     return processed_array
 
