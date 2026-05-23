@@ -146,5 +146,45 @@ def generate_recommendations(model, preprocessor, baseline_input, baseline_score
 
     return recommendations
 
+@app.post("/recommend")
+def recommend(request: PredictionRequest):
+    try:
+        input_dict = request.dict()
+
+        processed_data = preprocess_input(
+            input_dict,
+            preprocessor
+        )
+
+        baseline_score = predict(
+            model,
+            processed_data
+        )
+
+        baseline_score = max(
+            0.0,
+            min(100.0, baseline_score)
+        )
+
+        recommendations = generate_recommendations(
+            model=model,
+            preprocessor=preprocessor,
+            baseline_input=input_dict,
+            baseline_score=baseline_score
+        )
+
+        return {
+            "status": "success",
+            "predicted_exam_score": round(baseline_score, 2),
+            "recommendation_count": len(recommendations),
+            "recommendations": recommendations
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
