@@ -51,5 +51,100 @@ def predict_score(request: PredictionRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+def generate_recommendations(model, preprocessor, baseline_input, baseline_score):
+    recommendations = []
+
+    scenarios = []
+
+    # 1. Study Hours
+    curr_hours = baseline_input.get("Hours_Studied", 0)
+    if curr_hours < 30:
+        target_hours = min(35, curr_hours + 5)
+        scenarios.append({
+            "field": "Hours_Studied",
+            "val": target_hours,
+            "desc": f"Meningkatkan jam belajar mingguan siswa dari {curr_hours} menjadi {target_hours} jam"
+        })
+
+    # 2. Sleep Hours
+    curr_sleep = baseline_input.get("Sleep_Hours", 0)
+    if curr_sleep < 8:
+        target_sleep = 8
+        scenarios.append({
+            "field": "Sleep_Hours",
+            "val": target_sleep,
+            "desc": f"Mengoptimalkan waktu tidur siswa dari {curr_sleep} menjadi {target_sleep} jam"
+        })
+
+    # 3. Tutoring Sessions
+    curr_tutor = baseline_input.get("Tutoring_Sessions", 0)
+    if curr_tutor < 5:
+        target_tutor = min(8, curr_tutor + 2)
+        scenarios.append({
+            "field": "Tutoring_Sessions",
+            "val": target_tutor,
+            "desc": f"Menambah sesi tutor dari {curr_tutor} menjadi {target_tutor}"
+        })
+
+    # 4. Physical Activity
+    curr_phys = baseline_input.get("Physical_Activity", 0)
+    if curr_phys < 5:
+        target_phys = min(6, curr_phys + 2)
+        scenarios.append({
+            "field": "Physical_Activity",
+            "val": target_phys,
+            "desc": f"Meningkatkan aktivitas fisik dari {curr_phys} menjadi {target_phys} jam/minggu"
+        })
+
+    # 5. Motivation
+    curr_motiv = baseline_input.get("Motivation_Level", "Medium")
+    if curr_motiv != "High":
+        scenarios.append({
+            "field": "Motivation_Level",
+            "val": "High",
+            "desc": f"Meningkatkan motivasi belajar dari {curr_motiv} menjadi High"
+        })
+
+    # 6. Parental Involvement
+    curr_parent = baseline_input.get("Parental_Involvement", "Medium")
+    if curr_parent != "High":
+        scenarios.append({
+            "field": "Parental_Involvement",
+            "val": "High",
+            "desc": f"Meningkatkan keterlibatan orang tua dari {curr_parent} menjadi High"
+        })
+
+    for scenario in scenarios:
+        temp_data = baseline_input.copy()
+        temp_data[scenario["field"]] = scenario["val"]
+
+        try:
+            processed = preprocess_input(
+                temp_data,
+                preprocessor
+            )
+
+            score = predict(model, processed)
+            score = max(0.0, min(100.0, score))
+
+            improvement = score - baseline_score
+
+            if improvement > 0.05:
+                recommendations.append({
+                    "description": scenario["desc"],
+                    "improvement": round(improvement, 2),
+                    "new_score": round(score, 2)
+                })
+
+        except:
+            continue
+
+    recommendations.sort(
+        key=lambda x: x["improvement"],
+        reverse=True
+    )
+
+    return recommendations
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
