@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { register, login } from "../services/api";
+import { getCurrentPrediction } from "../services/api"
 
 export default function SignInPage() {
   const navigate = useNavigate()
@@ -52,7 +53,16 @@ export default function SignInPage() {
         const res = await login({ email: form.email, password: form.password })
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('user', JSON.stringify(res.data.user))
-        navigate('/dashboard')
+        try {
+          const predRes = await getCurrentPrediction()
+          if (predRes.data.prediction) {
+            navigate('/dashboard') // sudah ada prediksi → langsung dashboard
+          } else {
+            navigate('/predict')   // belum ada → isi form dulu
+          }
+        } catch {
+          navigate('/predict')
+        }
       } else {
         await register({ name: form.name, email: form.email, password: form.password })
         setIsSignIn(true)

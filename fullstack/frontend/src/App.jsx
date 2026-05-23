@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import SignInPage from './pages/SignInPage'
 import DashboardPage from './pages/DashboardPage'
+import PredictPage from './pages/PredictPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -10,9 +11,13 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/register" element={<SignInPage />} />
-      <Route path="/dashboard" element={
+      <Route path="/dashboard/*" element={
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>} />
+      <Route path="/predict" element={
+        <ProtectedRoute>
+          <PredictPage />
         </ProtectedRoute>} />
     </Routes>
   )
