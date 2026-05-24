@@ -1,26 +1,24 @@
-import 'dotenv/config' 
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import authRoutes from './routes/auth.js'
 import predictRoutes from './routes/predict.js'
 
-const { HOST, PORT } = process.env;
-const app = express();
+const PORT = process.env.PORT || 3000
+const app = express()
 
-app.use(express.json());
-
-// Middleware
+app.use(express.json())
 app.use(cors({
-  origin: 'http://localhost:5173' // izinkan request dari Vite
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
 }))
 
-// Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/predict', predictRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'EduTrack API is running!' })
 })
-app.listen(PORT, HOST, () => {
-  console.log(`Server berjalan di http://${HOST}:${PORT}`);
-});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server berjalan di port ${PORT}`)
+})
