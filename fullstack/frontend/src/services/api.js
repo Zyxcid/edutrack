@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://capstoneproject-production-f10d.up.railway.app/api',
 })
 
 export const predict = (data) => api.post('/predict', data, {
