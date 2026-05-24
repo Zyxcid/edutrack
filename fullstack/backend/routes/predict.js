@@ -4,6 +4,8 @@ import pool from '../db.js'
 
 const router = express.Router()
 
+const AI_URL = process.env.AI_API_URL || 'http://localhost:8000'
+
 // ── Fungsi getWeekStart ────────────────────────────────────────────────────
 function getWeekStart() {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
@@ -24,14 +26,13 @@ router.post('/', verifyToken, async (req, res) => {
     const aiPayload = req.body
     const weekStart = getWeekStart()
 
-    // Kirim ke FastAPI predict dan recommend sekaligus
     const [predictResponse, recommendResponse] = await Promise.all([
-      fetch('http://localhost:8000/predict', {
+      fetch(`${AI_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(aiPayload)
       }),
-      fetch('http://localhost:8000/recommend', {
+      fetch(`${AI_URL}/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(aiPayload)
@@ -108,7 +109,7 @@ router.get('/current', verifyToken, async (req, res) => {
 // ── Simulasi What-If — TIDAK disimpan ke database ──────────────────────────
 router.post('/simulate', verifyToken, async (req, res) => {
   try {
-    const response = await fetch('http://localhost:8000/predict', {
+    const response = await fetch(`${AI_URL}/predict`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
