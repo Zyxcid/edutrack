@@ -4,29 +4,37 @@ import pool from '../db.js'
 
 const router = express.Router()
 
-// Fungsi untuk dapat tanggal Senin minggu ini
+// ── Fungsi getWeekStart ────────────────────────────────────────────────────
 function getWeekStart() {
-  const now = new Date()
-  const day = now.getDay() // 0=Minggu, 1=Senin, dst
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+  const day = now.getDay()
   const diff = now.getDate() - day + (day === 0 ? -6 : 1)
   const monday = new Date(now.setDate(diff))
-  return monday.toISOString().split('T')[0] // format: YYYY-MM-DD
+
+  const year = monday.getFullYear()
+  const month = String(monday.getMonth() + 1).padStart(2, '0')
+  const date = String(monday.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${date}`
 }
 
 // ── Predict & Simpan ke DB ─────────────────────────────────────────────────
 router.post('/', verifyToken, async (req, res) => {
   try {
-    // 1. Kirim ke FastAPI predict dan recommend sekaligus
+    const aiPayload = req.body
+    const weekStart = getWeekStart()
+
+    // Kirim ke FastAPI predict dan recommend sekaligus
     const [predictResponse, recommendResponse] = await Promise.all([
       fetch('http://localhost:8000/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req.body)
+        body: JSON.stringify(aiPayload)
       }),
       fetch('http://localhost:8000/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req.body)
+        body: JSON.stringify(aiPayload)
       })
     ])
 
@@ -38,9 +46,8 @@ router.post('/', verifyToken, async (req, res) => {
 
     const predictedScore = predictData.predicted_exam_score
     const recommendations = recommendData.recommendations ?? []
-    const weekStart = getWeekStart()
 
-    // 2. Simpan ke database
+    // Simpan ke database
     await pool.query(`
       INSERT INTO predictions (user_id, input, predicted_score, recommendations, week_start)
       VALUES ($1, $2, $3, $4, $5)
@@ -50,13 +57,7 @@ router.post('/', verifyToken, async (req, res) => {
         predicted_score = EXCLUDED.predicted_score,
         recommendations = EXCLUDED.recommendations,
         created_at = current_timestamp
-    `, [
-      req.user.id,
-      JSON.stringify(req.body),
-      predictedScore,
-      JSON.stringify(recommendations),
-      weekStart
-    ])
+    `, [req.user.id, JSON.stringify(aiPayload), predictedScore, JSON.stringify(recommendations), weekStart])
 
     res.json({
       predicted_exam_score: predictedScore,
@@ -104,6 +105,7 @@ router.get('/current', verifyToken, async (req, res) => {
   }
 })
 
+// ── Simulasi What-If — TIDAK disimpan ke database ──────────────────────────
 router.post('/simulate', verifyToken, async (req, res) => {
   try {
     const response = await fetch('http://localhost:8000/predict', {

@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { getCurrentPrediction } from "../../services/api"
+import { getCurrentPrediction, getPredictions } from "../../services/api"
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, ReferenceLine
+} from "recharts"
 
-// ── ScoreGauge (TIDAK BERUBAH) ────────────────────────────────────────────
+// ── ScoreGauge ─────────────────────────────────────────────────────────────
 function ScoreGauge({ score }) {
   const clamped = Math.min(100, Math.max(0, score))
   const color = clamped >= 75 ? "text-success" : clamped >= 50 ? "text-warning" : "text-error"
@@ -26,7 +30,7 @@ function ScoreGauge({ score }) {
   )
 }
 
-// ── StatCard (TIDAK BERUBAH) ──────────────────────────────────────────────
+// ── StatCard ───────────────────────────────────────────────────────────────
 function StatCard({ label, value, sub }) {
   return (
     <div className="card bg-base-200">
@@ -39,7 +43,7 @@ function StatCard({ label, value, sub }) {
   )
 }
 
-// ── RecommendationCard (TIDAK BERUBAH) ────────────────────────────────────
+// ── Recommendations ────────────────────────────────────────────────────────
 const medals = [
   { label: "Top Recommendation", color: "text-yellow-500", border: "border-yellow-200" },
   { label: "Second Recommendation", color: "text-gray-400", border: "border-gray-200" },
@@ -47,7 +51,7 @@ const medals = [
 ]
 const icons = ["🥇", "🥈", "🥉"]
 
-function RecommendationsSection({ recommendations, score }) {
+function RecommendationsSection({ recommendations }) {
   if (!recommendations || recommendations.length === 0) {
     return (
       <div className="card bg-base-100 shadow h-full">
@@ -91,24 +95,49 @@ function RecommendationsSection({ recommendations, score }) {
   )
 }
 
-// ── Main Component (DIUBAH LAYOUT-NYA) ────────────────────────────────────
+// ── Custom Tooltip ─────────────────────────────────────────────────────────
+function CustomTooltip({ active, payload, label }) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-base-100 border border-base-300 rounded-lg p-3 shadow text-sm">
+        <div className="font-bold mb-1">{label}</div>
+        <div className="text-primary font-extrabold">{payload[0].value.toFixed(1)} / 100</div>
+      </div>
+    )
+  }
+  return null
+}
+
+// ── Score Badge ────────────────────────────────────────────────────────────
+function ScoreBadge({ score }) {
+  if (score >= 75) return <span className="badge badge-success">High</span>
+  if (score >= 50) return <span className="badge badge-warning">Medium</span>
+  return <span className="badge badge-error">Low</span>
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
 export default function Overview() {
   const navigate = useNavigate()
   const [result, setResult] = useState(null)
+  const [predictions, setPredictions] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchPrediction = async () => {
+    const fetchData = async () => {
       try {
-        const res = await getCurrentPrediction()
-        setResult(res.data.prediction)
+        const [currentRes, historyRes] = await Promise.all([
+          getCurrentPrediction(),
+          getPredictions()
+        ])
+        setResult(currentRes.data.prediction)
+        setPredictions(historyRes.data.predictions)
       } catch (err) {
         console.error(err)
       } finally {
         setLoading(false)
       }
     }
-    fetchPrediction()
+    fetchData()
   }, [])
 
   if (loading) {
@@ -134,6 +163,20 @@ export default function Overview() {
   const input = result.input
   const recommendations = result.recommendations ?? []
 
+  // Chart data — urutkan dari lama ke baru
+  const chartData = [...predictions]
+    .reverse()
+    .map(p => ({
+      week: new Date(p.week_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      score: parseFloat(p.predicted_score.toFixed(1))
+    }))
+
+  // Summary stats
+  const avgScore = predictions.reduce((sum, p) => sum + p.predicted_score, 0) / predictions.length
+  const latest = predictions[0]?.predicted_score ?? 0
+  const oldest = predictions[predictions.length - 1]?.predicted_score ?? 0
+  const trend = latest - oldest
+
   return (
     <div className="flex flex-col gap-6">
 
@@ -152,10 +195,10 @@ export default function Overview() {
         </button>
       </div>
 
-      {/* GRID UTAMA: 2 kolom di layar lebar (3 kiri, 2 kanan) */}
+      {/* GRID UTAMA: 2 kolom di layar lebar */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        
-        {/* KOLOM KIRI (3/5 lebar layar) */}
+
+        {/* KOLOM KIRI (3/5) */}
         <div className="lg:col-span-3 flex flex-col gap-6">
           {/* Score Card */}
           <div className="card bg-base-100 shadow">
@@ -176,19 +219,103 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* KOLOM KANAN (2/5 lebar layar) */}
+        {/* KOLOM KANAN (2/5) */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <h2 className="font-bold text-lg flex items-center gap-2">
             <span>💡</span> AI Recommendations
           </h2>
-          <RecommendationsSection recommendations={recommendations} score={score} />
-          
+          <RecommendationsSection recommendations={recommendations} />
           <button className="btn btn-outline btn-sm w-full" onClick={() => navigate('/dashboard/whatif')}>
             Try What-If Simulation →
           </button>
         </div>
 
       </div>
+
+      {/* HISTORY — di bawah grid utama */}
+      {predictions.length > 0 && (
+        <>
+          <div className="divider">Progress History</div>
+
+          {/* Summary Stats */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="card bg-base-100 shadow">
+              <div className="card-body py-4 px-5">
+                <div className="text-sm text-base-content/50">Total Weeks</div>
+                <div className="text-2xl font-extrabold">{predictions.length}</div>
+              </div>
+            </div>
+            <div className="card bg-base-100 shadow">
+              <div className="card-body py-4 px-5">
+                <div className="text-sm text-base-content/50">Average Score</div>
+                <div className="text-2xl font-extrabold text-primary">{avgScore.toFixed(1)}</div>
+              </div>
+            </div>
+            <div className="card bg-base-100 shadow">
+              <div className="card-body py-4 px-5">
+                <div className="text-sm text-base-content/50">Overall Trend</div>
+                <div className={`text-2xl font-extrabold ${trend >= 0 ? 'text-success' : 'text-error'}`}>
+                  {trend >= 0 ? '+' : ''}{trend.toFixed(1)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Chart — hanya kalau lebih dari 1 data */}
+          {predictions.length > 1 && (
+            <div className="card bg-base-100 shadow">
+              <div className="card-body">
+                <h2 className="font-bold mb-2">Score Trend</h2>
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="4 4" label={{ value: "High", fontSize: 11, fill: "#22c55e" }} />
+                    <ReferenceLine y={50} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: "Medium", fontSize: 11, fill: "#f59e0b" }} />
+                    <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={2.5}
+                      dot={{ r: 5, fill: "#6366f1" }} activeDot={{ r: 7 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+
+          {/* Weekly Cards */}
+          <div className="flex flex-col gap-3">
+            {predictions.map((p, i) => (
+              <div key={p.id} className="card bg-base-100 shadow">
+                <div className="card-body py-4 flex-row items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-extrabold
+                      ${i === 0 ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'}`}>
+                      W{predictions.length - i}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">
+                        Week of {new Date(p.week_start).toLocaleDateString('en-US', {
+                          month: 'long', day: 'numeric', year: 'numeric'
+                        })}
+                      </div>
+                      <div className="text-xs text-base-content/40">
+                        {i === 0 ? 'Latest' : `${i} week${i > 1 ? 's' : ''} ago`}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <ScoreBadge score={p.predicted_score} />
+                    <div className="text-2xl font-extrabold text-primary">
+                      {p.predicted_score.toFixed(1)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
     </div>
   )
 }
