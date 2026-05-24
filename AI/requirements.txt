@@ -1,9 +1,7 @@
-tensorflow
+tensorflow-cpu==2.19.0
 numpy
 pandas
 fastapi
-flask
-tensorboard
-matplotlib
-scikit-learn
 uvicorn
+scikit-learn==1.6.1
+joblib
