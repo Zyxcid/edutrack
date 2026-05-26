@@ -5,6 +5,10 @@ import pandas as pd
 # Add the AI directory to Python search path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Configure stdout to use UTF-8 encoding (prevents emoji crashes on Windows)
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
 from src.inference.predict import load_inference_components, preprocess_input, predict
 
 def clear_screen():

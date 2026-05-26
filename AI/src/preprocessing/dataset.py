@@ -18,9 +18,16 @@ def clean_data(data):
     pass
 
 def preprocess_data(data):
-    """Normalize, encode, or transform data."""
+    """Normalize, encode, or transform data without data leakage."""
     X = data.drop('Academic_Readiness', axis=1)
     y = data['Academic_Readiness']
+    
+    # Split raw data first to avoid data leakage (Train-Test Contamination)
+    # Ratio: 45% train, 45% val, 10% test (45/45/10 ratio as specified in CONTEXT.md)
+    # Step 1: Split into Train (45%) and Temp (55%) -> test_size = 0.55
+    # Step 2: Split Temp into Val (45% of total) and Test (10% of total) -> test_size = 10/55 (approx 18.18%)
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.55, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=(10/55), random_state=42)
     
     numeric_features = X.select_dtypes(include=['int64', 'float64']).columns
     categorical_features = X.select_dtypes(include=['object']).columns
@@ -41,16 +48,23 @@ def preprocess_data(data):
             ('cat', categorical_transformer, list(categorical_features))
         ])
 
-    X_processed = preprocessor.fit_transform(X)
-    y_processed = y.fillna(y.median()).values
+    # Fit and transform ONLY the training features to prevent leaking validation/test statistics
+    X_train_processed = preprocessor.fit_transform(X_train)
+    
+    # Transform validation and test features using the FITTED preprocessor (no fitting on val/test!)
+    X_val_processed = preprocessor.transform(X_val)
+    X_test_processed = preprocessor.transform(X_test)
+    
+    # Fill missing target values using the median calculated ONLY from y_train
+    y_train_median = y_train.median()
+    y_train_processed = y_train.fillna(y_train_median).values
+    y_val_processed = y_val.fillna(y_train_median).values
+    y_test_processed = y_test.fillna(y_train_median).values
     
     os.makedirs('saved_model', exist_ok=True)
     joblib.dump(preprocessor, 'saved_model/preprocessor.pkl')
     
-    X_train, X_temp, y_train, y_temp = train_test_split(X_processed, y_processed, test_size=0.2, random_state=42)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
-    
-    return (X_train, y_train), (X_val, y_val), (X_test, y_test)
+    return (X_train_processed, y_train_processed), (X_val_processed, y_val_processed), (X_test_processed, y_test_processed)
 
 def build_tf_dataset(features, labels, batch_size=32):
     """Build a tf.data.Dataset for efficient training."""
