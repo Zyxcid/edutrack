@@ -29,7 +29,10 @@ def main():
     early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=30, restore_best_weights=True)
     lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_mae', factor=0.5, patience=10, min_lr=1e-5)
     
-    history = train_model(model, train_ds, val_ds, epochs=300, callbacks=[custom_callback, early_stop, lr_reducer, csv_logger])
+    # TensorBoard logs directory
+    tensorboard_cb = tf.keras.callbacks.TensorBoard(log_dir='logs/tensorboard', histogram_freq=1)
+    
+    history = train_model(model, train_ds, val_ds, epochs=300, callbacks=[custom_callback, early_stop, lr_reducer, csv_logger, tensorboard_cb])
     
     print("--- Evaluating Model ---")
     results = evaluate_model(model, test_ds)

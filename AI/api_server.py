@@ -1,16 +1,29 @@
+import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 from src.inference.predict import load_inference_components, preprocess_input, predict
+import google.generativeai as genai
+
+# Configure Google Gemini API Key
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBoNKklA2iBy1XOQgqWmi68WDrMZjp5gBs")
+genai.configure(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="Exam Score Predictor AI")
 
-print("Loading model components...")
-model, preprocessor = load_inference_components(
-    model_path="saved_model/model.keras",
-    preprocessor_path="saved_model/preprocessor.pkl"
-)
-print("Model loaded successfully!")
+# Load inference components – either local model files or a Vertex AI endpoint
+# Set environment variable USE_VERTEX=true to enable Vertex AI inference
+use_vertex = bool(os.getenv("VERTEX_ENDPOINT_ID"))
+
+# Unified helper that returns the appropriate components
+from google_ai_client import get_inference_components, vertex_predict
+model, preprocessor, endpoint_resource = get_inference_components(use_vertex)
+# ``model`` is None when using Vertex AI; ``endpoint_resource`` holds the full resource name
+if use_vertex:
+    print(f"🔧 Using Vertex AI endpoint: {endpoint_resource}")
+else:
+    print("✅ Loaded local TensorFlow model and preprocessor")
+    endpoint_resource = None
 
 class PredictionRequest(BaseModel):
     Hours_Studied: int
@@ -119,12 +132,16 @@ def generate_recommendations(model, preprocessor, baseline_input, baseline_score
         temp_data[scenario["field"]] = scenario["val"]
 
         try:
-            processed = preprocess_input(
-                temp_data,
-                preprocessor
-            )
-
-            score = predict(model, processed)
+            if use_vertex:
+                # Vertex AI expects a list of instances
+                score = vertex_predict(endpoint_resource, [temp_data])[0]
+            else:
+                processed = preprocess_input(
+                    temp_data,
+                    preprocessor
+                )
+                score = predict(model, processed)
+            
             score = max(0.0, min(100.0, score))
 
             improvement = score - baseline_score
@@ -145,6 +162,10 @@ def generate_recommendations(model, preprocessor, baseline_input, baseline_score
     )
 
     return recommendations
+
+class ChatRequest(BaseModel):
+    student_stats: PredictionRequest
+    user_message: str
 
 @app.post("/recommend")
 def recommend(request: PredictionRequest):
@@ -173,11 +194,40 @@ def recommend(request: PredictionRequest):
             baseline_score=baseline_score
         )
 
+        # Custom Side Quest: Generate personalized and interactive explanation using Google Gemini API
+        generative_explanation = ""
+        try:
+            prompt = f"""
+            Anda adalah Konselor Pendidikan AI yang ramah, empati, dan profesional. 
+            Tugas Anda adalah menganalisis prediksi nilai ujian siswa berikut dan menyusun penjelasan yang memotivasi serta memberikan saran belajar yang konkret berdasarkan rekomendasi tindakan dari sistem AI kami.
+
+            === INFORMASI SISWA ===
+            - Prediksi Nilai Ujian Saat Ini: {round(baseline_score, 2)} dari 100
+            - Statistik Masukan Siswa: {input_dict}
+
+            === REKOMENDASI AI UNTUK PENINGKATAN ===
+            {recommendations}
+
+            === INSTRUKSI STRUKTUR OUTPUT ===
+            Tuliskan dalam Bahasa Indonesia yang interaktif dan menyemangati:
+            1. Sapaan hangat dan analisis singkat mengenai prediksi nilainya saat ini.
+            2. Penjelasan mengapa tindakan-tindakan rekomendasi di atas penting (hubungkan secara ilmiah/logis dengan performa siswa, misalnya jam tidur memengaruhi konsentrasi, dll.).
+            3. Kalimat penyemangat penutup yang kuat.
+            Tulis penjelasan dengan format Markdown yang rapi (gunakan emoji jika sesuai).
+            """
+            
+            gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+            response = gemini_model.generate_content(prompt)
+            generative_explanation = response.text.strip()
+        except Exception as gemini_err:
+            generative_explanation = f"Gagal menghasilkan penjelasan AI Generatif: {str(gemini_err)}"
+
         return {
             "status": "success",
             "predicted_exam_score": round(baseline_score, 2),
             "recommendation_count": len(recommendations),
-            "recommendations": recommendations
+            "recommendations": recommendations,
+            "generative_explanation": generative_explanation
         }
 
     except Exception as e:
@@ -185,6 +235,44 @@ def recommend(request: PredictionRequest):
             status_code=400,
             detail=str(e)
         )
+
+@app.post("/chat-advisor")
+def chat_advisor(request: ChatRequest):
+    try:
+        stats = request.student_stats.dict()
+        user_msg = request.user_message
+        
+        # Calculate baseline prediction using our ML model
+        processed_data = preprocess_input(stats, preprocessor)
+        baseline_score = predict(model, processed_data)
+        baseline_score = max(0.0, min(100.0, baseline_score))
+        
+        prompt = f"""
+        Anda adalah Konselor Pendidikan AI yang ramah dan ahli. 
+        Siswa saat ini memiliki statistik belajar sebagai berikut:
+        {stats}
+        
+        Prediksi nilai ujian mereka saat ini menggunakan model Deep Learning kami adalah: {round(baseline_score, 2)} / 100.
+        
+        Siswa mengajukan pertanyaan berikut kepada Anda:
+        "{user_msg}"
+        
+        Tugas Anda:
+        1. Jawab pertanyaan siswa tersebut dengan ramah, memotivasi, dan logis secara ilmiah dalam Bahasa Indonesia.
+        2. Hubungkan jawaban Anda dengan statistik belajarnya saat ini jika relevan.
+        3. Format tanggapan Anda menggunakan Markdown agar mudah dibaca di aplikasi (gunakan bullet points, bold text, dll.).
+        """
+        
+        gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+        response = gemini_model.generate_content(prompt)
+        
+        return {
+            "status": "success",
+            "predicted_score": round(baseline_score, 2),
+            "answer": response.text.strip()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     import os
