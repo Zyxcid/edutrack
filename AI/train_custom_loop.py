@@ -3,6 +3,8 @@ import sys
 import tensorflow as tf
 import numpy as np
 import time
+import csv
+from pathlib import Path
 
 # Configure stdout to use UTF-8 encoding (prevents emoji crashes on Windows)
 if hasattr(sys.stdout, 'reconfigure'):
@@ -79,6 +81,16 @@ def main():
     best_val_mae = float('inf')
     best_weights = None
     
+    # Prepare CSV logging for training epochs and later test results
+    log_dir = Path(__file__).parent / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / "training_log.csv"
+    # Write header if file does not exist
+    header = ["epoch","accuracy","learning_rate","loss","mae","mse","val_accuracy","val_loss","val_mae","val_mse","test_accuracy"]
+    if not log_file.is_file():
+        with open(log_file, "w", newline="") as f:
+            csv.writer(f).writerow(header)
+    
     for epoch in range(epochs):
         start_time = time.time()
         
@@ -107,6 +119,10 @@ def main():
         print(f"Epoch {epoch+1:02d}/{epochs:02d} [{epoch_time:.2f}s] -> "
               f"Loss: {train_loss:.5f} | MAE: {train_mae:.5f} || "
               f"Val Loss: {val_loss:.5f} | Val MAE: {val_mae:.5f}")
+        
+        # Append epoch metrics to CSV (train accuracy not tracked, placeholder empty)
+        with open(log_file, "a", newline="") as f:
+            csv.writer(f).writerow([epoch+1, "", "", train_loss, train_mae, "", "", val_loss, "", val_mae, ""])
         
         # Save best weights (similar to EarlyStopping's restore_best_weights)
         if val_mae < best_val_mae:
@@ -138,6 +154,13 @@ def main():
     final_acc = accuracy(y_true_tf, y_pred_tf).numpy()
     
     print(f"-> Final Test Evaluation - MAE: {final_test_mae:.5f} | Accuracy: {final_acc * 100:.2f}%")
+    # Append test accuracy to CSV
+    with open(log_file, "a", newline="") as f:
+        csv.writer(f).writerow(["test", "", "", "", "", "", "", "", "", "", f"{final_acc:.5f}"])
+        # Record which model was used (local or Vertex AI)
+        use_vertex = bool(os.getenv("VERTEX_ENDPOINT_ID"))
+        best_model_desc = "Vertex AI endpoint" if use_vertex else "Local TensorFlow model"
+        csv.writer(f).writerow(["best_model", best_model_desc] + [""] * 9)
 
     # 5. Save the trained model
     print("\n--- Saving Custom Trained Model ---")

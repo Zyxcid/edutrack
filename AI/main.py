@@ -1,4 +1,5 @@
 import os
+import csv
 import tensorflow as tf
 from src.preprocessing.dataset import load_data, preprocess_data, build_tf_dataset
 from src.training.train import build_model, train_model, save_trained_model
@@ -38,9 +39,20 @@ def main():
     results = evaluate_model(model, test_ds)
     print(f"Test Evaluation Results [Loss, MAE, MSE, Accuracy]: {results}")
     
-    print("--- Saving Model ---")
-    save_trained_model(model, "saved_model/model.keras")
-    save_trained_model(model, "saved_model/model.h5")
+    # Append test results to CSV log
+    log_path = os.path.join(os.path.dirname(__file__), "logs", "training_log.csv")
+    with open(log_path, "a", newline="") as f:
+        loss_str = f"{results[0]:.10f}"
+        mae_str = f"{results[1]:.10f}"
+        mse_str = f"{results[2]:.10f}"
+        acc_str = f"{results[3]:.10f}"
+        csv.writer(f).writerow(["test", "", "", loss_str, mae_str, mse_str, "", acc_str, "", "", ""])
+        use_vertex = bool(os.getenv("VERTEX_ENDPOINT_ID"))
+        best_model_desc = "Vertex AI endpoint" if use_vertex else "Local TensorFlow model"
+        csv.writer(f).writerow(["best_model", best_model_desc, "", loss_str, mae_str, mse_str, "", acc_str, "", "", ""])
+        print("--- Saving Model ---")
+        save_trained_model(model, "saved_model/model.keras")
+        save_trained_model(model, "saved_model/model.h5")
 
 if __name__ == "__main__":
     main()
