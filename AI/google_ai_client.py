@@ -128,6 +128,27 @@ def deploy_endpoint(
 
     return endpoint.resource_name
 
+
+def get_inference_components(use_vertex: bool = False):
+    """Load inference components (model and preprocessor), locally or via Vertex."""
+    if use_vertex:
+        endpoint_resource = os.environ.get("VERTEX_ENDPOINT_ID")
+        if not endpoint_resource:
+            raise ValueError("VERTEX_ENDPOINT_ID environment variable is not set")
+        return None, None, endpoint_resource
+    else:
+        # Import the local loaders from src
+        from src.inference.predict import load_inference_components as load_local
+        model, preprocessor = load_local()
+        return model, preprocessor, None
+
+
+def vertex_predict(endpoint_resource: str, instances: list) -> list:
+    """Make a prediction using a Vertex AI endpoint."""
+    endpoint = aiplatform.Endpoint(endpoint_resource)
+    response = endpoint.predict(instances=instances)
+    return response.predictions
+
 # CLI entry point
 
 def _parse_args():
