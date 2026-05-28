@@ -16,6 +16,7 @@ __pycache__/
 
 # Context info
 CONTEXT.md
+checklist_audit.md
 
 node_modules
 .env
