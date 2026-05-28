@@ -93,6 +93,7 @@ function Navbar() {
 }
 
 function HeroSection() {
+  const navigate = useNavigate()
   return (
     <section id="features" className="min-h-[90vh] flex items-center bg-linear-to-br from-base-100 to-base-200">
       <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
@@ -119,7 +120,7 @@ function HeroSection() {
         {/* Placeholder gambar kanan */}
         <div className="flex justify-center">
           <div className="w-full max-w-md aspect-square rounded-3xl bg-base-300 flex items-center justify-center shadow-xl">
-            <span className="text-base-content/30 text-sm"><img src="src\assets\analyticspreview.png" alt="Analytics Preview" /></span>
+            <span className="text-base-content/30 text-sm"><img src="analyticspreview.png" alt="Analytics Preview" /></span>
           </div>
         </div>
       </div>
@@ -226,6 +227,7 @@ function DashboardPreviewSection() {
 }
 
 function CTASection() {
+  const navigate = useNavigate() 
   return (
     <section className="py-24 bg-primary text-primary-content">
       <div className="max-w-2xl mx-auto px-6 text-center flex flex-col gap-6">
