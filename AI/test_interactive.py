@@ -45,7 +45,7 @@ def get_input(prompt_text, type_fn, default=None, options=None):
                 
         # Validate options
         if options:
-            # Normalize to match casing in options (e.g. Yes/No, High School)
+            # Normalize to match casing in options
             matched = None
             for opt in options:
                 if user_input.lower() == opt.lower():

@@ -39,7 +39,7 @@ def main():
     model.summary()
     
     # 3. Custom Training parameters
-    epochs = 50  # Let's run a solid 50 epochs for demonstration
+    epochs = 50
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.005)
     loss_fn = tf.keras.losses.MeanSquaredError()
     
@@ -120,11 +120,11 @@ def main():
               f"Loss: {train_loss:.5f} | MAE: {train_mae:.5f} || "
               f"Val Loss: {val_loss:.5f} | Val MAE: {val_mae:.5f}")
         
-        # Append epoch metrics to CSV (train accuracy not tracked, placeholder empty)
+        # Append epoch metrics to CSV
         with open(log_file, "a", newline="") as f:
             csv.writer(f).writerow([epoch+1, "", "", train_loss, train_mae, "", "", val_loss, "", val_mae, ""])
         
-        # Save best weights (similar to EarlyStopping's restore_best_weights)
+        # Save best weights
         if val_mae < best_val_mae:
             best_val_mae = val_mae
             best_weights = model.get_weights()

@@ -3,8 +3,7 @@
 This repository contains the AI Engineer workflow for the ML/DL project.
 
 ## Directory Structure
-- `data/` : Raw, processed, and sample datasets.
-- `models/` : Saved models (Keras/SavedModel format) and model architectures.
-- `notebooks/` : Jupyter notebooks for EDA and experimentation.
+- `data/` : Raw and processed datasets.
+- `models/` : Saved models (SavedModel format).
 - `src/` : Source code for the pipeline (preprocessing, training, etc.)
-- `logs/` : TensorBoard logs.
+- `logs/` : Train logs, TensorBoard logs.

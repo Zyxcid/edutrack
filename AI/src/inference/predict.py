@@ -3,9 +3,7 @@ import pandas as pd
 import joblib
 
 def load_inference_components(model_path="saved_model/model.keras", preprocessor_path="saved_model/preprocessor.pkl"):
-    """
-    Load pre-trained model and scikit-learn preprocessor.
-    """
+    # Load pre-trained model and scikit-learn preprocessor.
     model = tf.keras.models.load_model(model_path, compile=False)
     preprocessor = joblib.load(preprocessor_path)
     return model, preprocessor
@@ -35,9 +33,7 @@ def derive_performance_category(row):
 
 
 def add_derived_features(df):
-    """
-    Add derived features required by the saved preprocessor.
-    """
+    # Add derived features required by the saved preprocessor.
     df = df.copy()
 
     df['Study_Efficiency'] = (
@@ -85,9 +81,7 @@ def add_derived_features(df):
 
 
 def preprocess_input(input_dict, preprocessor):
-    """
-    Preprocess raw dict input into model-ready tensor.
-    """
+    # Preprocess raw dict input into model-ready tensor.
     df = pd.DataFrame([input_dict])
     df = add_derived_features(df)
     
@@ -117,9 +111,7 @@ def preprocess_input(input_dict, preprocessor):
 
 
 def predict(model, processed_input):
-    """
-    Perform a prediction and return human-readable score.
-    """
+    # Perform a prediction and return human-readable score.
     predictions = model.predict(processed_input, verbose=0)
     # Re-scale back to real score (since we divided by 100 during training)
     final_score = predictions[0][0] * 100.0

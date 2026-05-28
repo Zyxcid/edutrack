@@ -27,9 +27,7 @@ from google.cloud import storage
 from google.cloud import aiplatform
 from google.api_core import exceptions as api_exceptions
 
-# ---------------------------------------------------------------------------
 # Helper functions
-# ---------------------------------------------------------------------------
 
 def upload_to_gcs(
     local_path: str,
@@ -130,9 +128,7 @@ def deploy_endpoint(
 
     return endpoint.resource_name
 
-# ---------------------------------------------------------------------------
 # CLI entry point
-# ---------------------------------------------------------------------------
 
 def _parse_args():
     parser = argparse.ArgumentParser(description="Upload model artifacts to GCS and deploy to Vertex AI")
@@ -158,8 +154,6 @@ def main():
     print("Uploading model files to GCS ...")
     model_uri = upload_to_gcs(args.model_path, args.bucket, "model")
     preproc_uri = upload_to_gcs(args.preproc_path, args.bucket, "preprocessor")
-    # Vertex AI expects a single artifact URI that points to a directory containing both
-    # files. For simplicity we upload them under the same prefix.
     artifact_uri = f"gs://{args.bucket}/"
     print(f"Artifacts uploaded to {artifact_uri}")
 

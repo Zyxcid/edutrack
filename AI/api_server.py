@@ -11,7 +11,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="Exam Score Predictor AI")
 
-# Load inference components – either local model files or a Vertex AI endpoint
+# Load inference components
 # Set environment variable USE_VERTEX=true to enable Vertex AI inference
 use_vertex = bool(os.getenv("VERTEX_ENDPOINT_ID"))
 
@@ -194,7 +194,7 @@ def recommend(request: PredictionRequest):
             baseline_score=baseline_score
         )
 
-        # Custom Side Quest: Generate personalized and interactive explanation using Google Gemini API
+        # Generate personalized and interactive explanation using Google Gemini API
         generative_explanation = ""
         try:
             prompt = f"""

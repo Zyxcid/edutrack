@@ -10,22 +10,22 @@ import joblib
 import os
 
 def load_data(file_path):
-    """Load dataset from file."""
+    # Load dataset from file.
     return pd.read_csv(file_path)
 
 def clean_data(data):
-    """Perform data cleaning operations here."""
+    # Perform data cleaning operations here.
     pass
 
 def preprocess_data(data):
-    """Normalize, encode, or transform data without data leakage."""
+    # Normalize, encode, or transform data without data leakage.
     X = data.drop('Academic_Readiness', axis=1)
     y = data['Academic_Readiness']
     
-    # Split raw data first to avoid data leakage (Train-Test Contamination)
-    # Ratio: 45% train, 45% val, 10% test (45/45/10 ratio as specified in CONTEXT.md)
+    # Split raw data first to avoid data leakage
+    # Ratio: 45% train, 45% val, 10% test
     # Step 1: Split into Train (45%) and Temp (55%) -> test_size = 0.55
-    # Step 2: Split Temp into Val (45% of total) and Test (10% of total) -> test_size = 10/55 (approx 18.18%)
+    # Step 2: Split Temp into Val (45% of total) and Test (10% of total) -> test_size = 10/55
     X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.55, random_state=42)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=(10/55), random_state=42)
     
@@ -67,7 +67,7 @@ def preprocess_data(data):
     return (X_train_processed, y_train_processed), (X_val_processed, y_val_processed), (X_test_processed, y_test_processed)
 
 def build_tf_dataset(features, labels, batch_size=32):
-    """Build a tf.data.Dataset for efficient training."""
+    # Build a tf.data.Dataset for efficient training.
     dataset = tf.data.Dataset.from_tensor_slices((features, labels))
     dataset = dataset.shuffle(buffer_size=1024).batch(batch_size).prefetch(tf.data.AUTOTUNE)
     return dataset
