@@ -29,7 +29,7 @@ const IconMenu = () => (
 
 // ── Menu Config ────────────────────────────────────────────────────────────
 const menuItems = [
-  { label: "Ikhtisar", icon: <IconOverview />, path: "/dashboard" },
+  { label: "Overview", icon: <IconOverview />, path: "/dashboard" },
   { label: "What-If", icon: <IconBeaker />, path: "/dashboard/whatif" },
   { label: "Profil", icon: <IconUser />, path: "/dashboard/profile" },
 ]

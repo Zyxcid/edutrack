@@ -16,8 +16,8 @@ export default function Profile() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold">Profile</h1>
-        <p className="text-base-content/50 text-sm mt-1">Your account information</p>
+        <h1 className="text-2xl font-extrabold">Profil</h1>
+        <p className="text-base-content/50 text-sm mt-1">Informasi akun Anda</p>
       </div>
 
       {/* Profile Card */}
@@ -44,9 +44,9 @@ export default function Profile() {
           {/* Info */}
           <div className="flex flex-col gap-3">
             {[
-              { label: "Full Name", value: user?.name ?? "-" },
+              { label: "Nama Lengkap", value: user?.name ?? "-" },
               { label: "Email", value: user?.email ?? "-" },
-              { label: "Account ID", value: `#${user?.id ?? "-"}` },
+              { label: "ID Akun", value: `#${user?.id ?? "-"}` },
             ].map(({ label, value }) => (
               <div key={label} className="flex justify-between items-center">
                 <span className="text-sm text-base-content/50">{label}</span>
@@ -60,7 +60,7 @@ export default function Profile() {
           {/* Actions */}
           <div className="flex gap-3">
             <button className="btn btn-error btn-outline btn-sm" onClick={handleLogout}>
-              Logout
+              Keluar
             </button>
           </div>
 

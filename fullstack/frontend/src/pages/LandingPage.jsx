@@ -49,9 +49,9 @@ const features = [
 ];
 
 const steps = [
-  { num: "1", title: "Integrasi Data", desc: "Sambungkan sistem pendidikan Anda dan impor data siswa, tugas, serta metrik performa secara mulus, sesuaikan dengan realita proyek saat ini." },
-  { num: "2", title: "Analisis AI", desc: "Algoritme machine learning kami menganalisis pola, memprediksi hasil, dan mengenali siswa berisiko secara otomatis." },
-  { num: "3", title: "Wawasan yang Dapat Ditindaklanjuti", desc: "Akses dashboard komprehensif dengan rekomendasi personalisasi dan strategi intervensi untuk hasil yang lebih baik." },
+  { num: "1", title: "Input Profil", desc: "Isi data kebiasaan dan riwayat akademik siswa." },
+  { num: "2", title: "Analisis AI", desc: "Algoritme machine learning kami menganalisis pola dan memprediksi skor." },
+  { num: "3", title: "Dapatkan Wawasan", desc: "Akses dashboard komprehensif dengan rekomendasi personalisasi dan strategi intervensi untuk hasil yang lebih baik." },
 ];
 
 const navLinks = ["Fitur", "Cara Kerja", "Dashboard", "Tentang"];

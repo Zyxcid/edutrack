@@ -19,9 +19,9 @@ function ScoreGauge({ score }) {
       <div className={`text-6xl lg:text-7xl font-extrabold ${color}`}>
         {clamped.toFixed(1)}
       </div>
-      <div className="text-base-content/50 text-sm">out of 100</div>
+      <div className="text-base-content/50 text-sm">dari 100</div>
       <div className={`badge ${badgeColor} badge-lg font-semibold`}>
-        {badge} Performance
+        {badge === 'High' ? 'Performa Tinggi' : badge === 'Medium' ? 'Performa Sedang' : 'Performa Rendah'}
       </div>
       <div className="w-full max-w-xs">
         <progress className={`progress w-full ${progressColor}`} value={clamped} max="100" />
@@ -45,9 +45,9 @@ function StatCard({ label, value, sub }) {
 
 // ── Recommendations ────────────────────────────────────────────────────────
 const medals = [
-  { label: "Top Recommendation", color: "text-yellow-500", border: "border-yellow-200" },
-  { label: "Second Recommendation", color: "text-gray-400", border: "border-gray-200" },
-  { label: "Third Recommendation", color: "text-amber-600", border: "border-amber-200" },
+  { label: "Rekomendasi Terbaik", color: "text-yellow-500", border: "border-yellow-200" },
+  { label: "Rekomendasi Kedua", color: "text-gray-400", border: "border-gray-200" },
+  { label: "Rekomendasi Ketiga", color: "text-amber-600", border: "border-amber-200" },
 ]
 const icons = ["🥇", "🥈", "🥉"]
 
@@ -57,9 +57,9 @@ function RecommendationsSection({ recommendations }) {
       <div className="card bg-base-100 shadow h-full">
         <div className="card-body items-center text-center gap-2 justify-center h-full">
           <div className="text-4xl">✨</div>
-          <h3 className="font-bold">Excellent Profile!</h3>
+          <h3 className="font-bold">Profil Telah Optimal!</h3>
           <p className="text-base-content/50 text-sm">
-            Your student profile is already optimal. No significant improvements needed.
+            Profil siswanya sudah baik. Tidak perlu perbaikan besar saat ini.
           </p>
         </div>
       </div>
@@ -80,11 +80,11 @@ function RecommendationsSection({ recommendations }) {
             <p className="text-sm leading-relaxed">{rec.description}</p>
             <div className="flex gap-4 flex-wrap">
               <div className="text-sm">
-                <span className="text-base-content/50">Impact: </span>
-                <span className="font-bold text-success">+{rec.improvement?.toFixed(2)} points</span>
+                <span className="text-base-content/50">Dampak: </span>
+                <span className="font-bold text-success">+{rec.improvement?.toFixed(2)} poin</span>
               </div>
               <div className="text-sm">
-                <span className="text-base-content/50">New score: </span>
+                <span className="text-base-content/50">Skor baru: </span>
                 <span className="font-bold text-primary">{rec.new_score?.toFixed(1)}</span>
               </div>
             </div>
@@ -110,9 +110,9 @@ function CustomTooltip({ active, payload, label }) {
 
 // ── Score Badge ────────────────────────────────────────────────────────────
 function ScoreBadge({ score }) {
-  if (score >= 75) return <span className="badge badge-success">High</span>
-  if (score >= 50) return <span className="badge badge-warning">Medium</span>
-  return <span className="badge badge-error">Low</span>
+  if (score >= 75) return <span className="badge badge-success">Tinggi</span>
+  if (score >= 50) return <span className="badge badge-warning">Sedang</span>
+  return <span className="badge badge-error">Rendah</span>
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────
@@ -151,9 +151,9 @@ export default function Overview() {
   if (!result) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-base-content/50">No prediction this week yet.</p>
+        <p className="text-base-content/50">Belum ada prediksi untuk minggu ini.</p>
         <button className="btn btn-primary" onClick={() => navigate('/predict')}>
-          Start Prediction
+          Mulai Prediksi
         </button>
       </div>
     )
@@ -167,7 +167,7 @@ export default function Overview() {
   const chartData = [...predictions]
     .reverse()
     .map(p => ({
-      week: new Date(p.week_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      week: new Date(p.week_start).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' }),
       score: parseFloat(p.predicted_score.toFixed(1))
     }))
 
@@ -185,13 +185,13 @@ export default function Overview() {
         <div>
           <h1 className="text-2xl font-extrabold">Overview</h1>
           <p className="text-base-content/50 text-sm mt-1">
-            Week of {new Date(result.week_start).toLocaleDateString('en-US', {
+            Minggu {new Date(result.week_start).toLocaleDateString('id-ID', {
               month: 'long', day: 'numeric', year: 'numeric'
             })}
           </p>
         </div>
         <button className="btn btn-primary btn-sm" onClick={() => navigate('/predict')}>
-          Update This Week
+          Perbarui Minggu Ini
         </button>
       </div>
 
@@ -203,30 +203,30 @@ export default function Overview() {
           {/* Score Card */}
           <div className="card bg-base-100 shadow">
             <div className="card-body items-center text-center gap-2">
-              <h2 className="card-title">Predicted Exam Score</h2>
+              <h2 className="card-title">Skor Ujian yang Diprediksi</h2>
               <ScoreGauge score={score} />
             </div>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <StatCard label="Hours Studied" value={`${input.Hours_Studied}h`} sub="per week" />
-            <StatCard label="Attendance" value={`${input.Attendance}%`} sub="class presence" />
-            <StatCard label="Previous Score" value={input.Previous_Scores} sub="last exam" />
-            <StatCard label="Sleep Hours" value={`${input.Sleep_Hours}h`} sub="per night" />
-            <StatCard label="Tutoring Sessions" value={input.Tutoring_Sessions} sub="per month" />
-            <StatCard label="Motivation" value={input.Motivation_Level} sub="level" />
+            <StatCard label="Jam Belajar" value={`${input.Hours_Studied}h`} sub="per minggu" />
+            <StatCard label="Kehadiran" value={`${input.Attendance}%`} sub="kehadiran kelas" />
+            <StatCard label="Skor Sebelumnya" value={input.Previous_Scores} sub="ujian terakhir" />
+            <StatCard label="Jam Tidur" value={`${input.Sleep_Hours}h`} sub="per malam" />
+            <StatCard label="Sesi Bimbingan" value={input.Tutoring_Sessions} sub="per bulan" />
+            <StatCard label="Motivasi" value={input.Motivation_Level} sub="tingkat" />
           </div>
         </div>
 
         {/* KOLOM KANAN (2/5) */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <h2 className="font-bold text-lg flex items-center gap-2">
-            <span>💡</span> AI Recommendations
+            <span>💡</span> Rekomendasi AI
           </h2>
           <RecommendationsSection recommendations={recommendations} />
           <button className="btn btn-outline btn-sm w-full" onClick={() => navigate('/dashboard/whatif')}>
-            Try What-If Simulation →
+            Coba Simulasi What-If →
           </button>
         </div>
 
@@ -235,25 +235,25 @@ export default function Overview() {
       {/* HISTORY — di bawah grid utama */}
       {predictions.length > 0 && (
         <>
-          <div className="divider">Progress History</div>
+          <div className="divider">Riwayat Perkembangan</div>
 
           {/* Summary Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="card bg-base-100 shadow">
               <div className="card-body py-4 px-5">
-                <div className="text-sm text-base-content/50">Total Weeks</div>
+                <div className="text-sm text-base-content/50">Total Minggu</div>
                 <div className="text-2xl font-extrabold">{predictions.length}</div>
               </div>
             </div>
             <div className="card bg-base-100 shadow">
               <div className="card-body py-4 px-5">
-                <div className="text-sm text-base-content/50">Average Score</div>
+                <div className="text-sm text-base-content/50">Rata-rata Skor</div>
                 <div className="text-2xl font-extrabold text-primary">{avgScore.toFixed(1)}</div>
               </div>
             </div>
             <div className="card bg-base-100 shadow">
               <div className="card-body py-4 px-5">
-                <div className="text-sm text-base-content/50">Overall Trend</div>
+                <div className="text-sm text-base-content/50">Tren Keseluruhan</div>
                 <div className={`text-2xl font-extrabold ${trend >= 0 ? 'text-success' : 'text-error'}`}>
                   {trend >= 0 ? '+' : ''}{trend.toFixed(1)}
                 </div>
@@ -265,15 +265,15 @@ export default function Overview() {
           {predictions.length > 1 && (
             <div className="card bg-base-100 shadow">
               <div className="card-body">
-                <h2 className="font-bold mb-2">Score Trend</h2>
+                <h2 className="font-bold mb-2">Tren Skor</h2>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="week" tick={{ fontSize: 12 }} />
                     <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
                     <Tooltip content={<CustomTooltip />} />
-                    <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="4 4" label={{ value: "High", fontSize: 11, fill: "#22c55e" }} />
-                    <ReferenceLine y={50} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: "Medium", fontSize: 11, fill: "#f59e0b" }} />
+                    <ReferenceLine y={75} stroke="#22c55e" strokeDasharray="4 4" label={{ value: "Tinggi", fontSize: 11, fill: "#22c55e" }} />
+                    <ReferenceLine y={50} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: "Sedang", fontSize: 11, fill: "#f59e0b" }} />
                     <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={2.5}
                       dot={{ r: 5, fill: "#6366f1" }} activeDot={{ r: 7 }} />
                   </LineChart>
@@ -294,12 +294,12 @@ export default function Overview() {
                     </div>
                     <div>
                       <div className="font-semibold text-sm">
-                        Week of {new Date(p.week_start).toLocaleDateString('en-US', {
+                        Minggu {new Date(p.week_start).toLocaleDateString('id-ID', {
                           month: 'long', day: 'numeric', year: 'numeric'
                         })}
                       </div>
                       <div className="text-xs text-base-content/40">
-                        {i === 0 ? 'Latest' : `${i} week${i > 1 ? 's' : ''} ago`}
+                        {i === 0 ? 'Terbaru' : `${i} minggu lalu`}
                       </div>
                     </div>
                   </div>

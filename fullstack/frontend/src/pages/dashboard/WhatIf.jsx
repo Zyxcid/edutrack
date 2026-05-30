@@ -47,7 +47,7 @@ export default function WhatIf() {
       const res = await simulate(payload)
       setSimScore(res.data.predicted_exam_score)
     } catch (err) {
-      setError("Simulation failed. Please try again.")
+      setError("Simulasi gagal. Silakan coba lagi.")
     } finally {
       setSimLoading(false)
     }
@@ -64,9 +64,9 @@ export default function WhatIf() {
   if (!result || !simForm) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-base-content/50">No prediction this week yet.</p>
+        <p className="text-base-content/50">Belum ada prediksi untuk minggu ini.</p>
         <button className="btn btn-primary" onClick={() => navigate('/predict')}>
-          Start Prediction
+          Mulai Prediksi
         </button>
       </div>
     )
@@ -80,9 +80,9 @@ export default function WhatIf() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold">What-If Simulation</h1>
+        <h1 className="text-2xl font-extrabold">Simulasi What-If</h1>
         <p className="text-base-content/50 text-sm mt-1">
-          Adjust parameters below to see how they affect the predicted score.
+          Sesuaikan parameter di bawah untuk melihat pengaruhnya terhadap skor prediksi.
         </p>
       </div>
 
@@ -93,13 +93,13 @@ export default function WhatIf() {
         <div className="lg:col-span-2">
           <div className="card bg-base-100 shadow">
             <div className="card-body gap-4">
-              <h2 className="font-bold">Adjust Parameters</h2>
+              <h2 className="font-bold">Sesuaikan Parameter</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Hours Studied/Week</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Hours_Studied}</span>
+                    <span className="label-text text-sm font-medium">Jam Belajar/Minggu</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Hours_Studied}</span>
                   </div>
                   <input type="number" name="Hours_Studied" value={simForm.Hours_Studied}
                     onChange={handleChange} className="input input-bordered" min={0} max={100} />
@@ -107,8 +107,8 @@ export default function WhatIf() {
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Attendance (%)</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Attendance}</span>
+                    <span className="label-text text-sm font-medium">Kehadiran (%)</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Attendance}</span>
                   </div>
                   <input type="number" name="Attendance" value={simForm.Attendance}
                     onChange={handleChange} className="input input-bordered" min={0} max={100} />
@@ -116,8 +116,8 @@ export default function WhatIf() {
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Sleep Hours/Night</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Sleep_Hours}</span>
+                    <span className="label-text text-sm font-medium">Jam Tidur/Malam</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Sleep_Hours}</span>
                   </div>
                   <input type="number" name="Sleep_Hours" value={simForm.Sleep_Hours}
                     onChange={handleChange} className="input input-bordered" min={0} max={24} />
@@ -125,8 +125,8 @@ export default function WhatIf() {
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Tutoring Sessions/Month</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Tutoring_Sessions}</span>
+                    <span className="label-text text-sm font-medium">Sesi Bimbingan/Bulan</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Tutoring_Sessions}</span>
                   </div>
                   <input type="number" name="Tutoring_Sessions" value={simForm.Tutoring_Sessions}
                     onChange={handleChange} className="input input-bordered" min={0} max={30} />
@@ -134,19 +134,21 @@ export default function WhatIf() {
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Motivation Level</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Motivation_Level}</span>
+                    <span className="label-text text-sm font-medium">Tingkat Motivasi</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Motivation_Level}</span>
                   </div>
                   <select name="Motivation_Level" value={simForm.Motivation_Level}
                     onChange={handleChange} className="select select-bordered">
-                    {["Low", "Medium", "High"].map(o => <option key={o}>{o}</option>)}
+                    {[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }].map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
                   </select>
                 </label>
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Physical Activity (h/week)</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Physical_Activity}</span>
+                    <span className="label-text text-sm font-medium">Aktivitas Fisik (jam/minggu)</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Physical_Activity}</span>
                   </div>
                   <input type="number" name="Physical_Activity" value={simForm.Physical_Activity}
                     onChange={handleChange} className="input input-bordered" min={0} max={30} />
@@ -154,23 +156,27 @@ export default function WhatIf() {
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Parental Involvement</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Parental_Involvement}</span>
+                    <span className="label-text text-sm font-medium">Keterlibatan Orang Tua</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Parental_Involvement}</span>
                   </div>
                   <select name="Parental_Involvement" value={simForm.Parental_Involvement}
                     onChange={handleChange} className="select select-bordered">
-                    {["Low", "Medium", "High"].map(o => <option key={o}>{o}</option>)}
+                    {[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }].map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
                   </select>
                 </label>
 
                 <label className="form-control">
                   <div className="label pb-1">
-                    <span className="label-text text-sm font-medium">Extracurricular Activities</span>
-                    <span className="label-text-alt text-base-content/40">current: {result.input.Extracurricular_Activities}</span>
+                    <span className="label-text text-sm font-medium">Kegiatan Ekstrakurikuler</span>
+                    <span className="label-text-alt text-base-content/40">saat ini: {result.input.Extracurricular_Activities}</span>
                   </div>
                   <select name="Extracurricular_Activities" value={simForm.Extracurricular_Activities}
                     onChange={handleChange} className="select select-bordered">
-                    {["Yes", "No"].map(o => <option key={o}>{o}</option>)}
+                    {[{ value: "Yes", label: "Ya" }, { value: "No", label: "Tidak" }].map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
                   </select>
                 </label>
 
@@ -181,13 +187,13 @@ export default function WhatIf() {
                 <button className="btn btn-primary" onClick={handleSimulate} disabled={simLoading}>
                   {simLoading
                     ? <span className="loading loading-spinner loading-sm" />
-                    : "Run Simulation 🔮"}
+                    : "Jalankan Simulasi 🔮"}
                 </button>
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={() => { setSimForm(result.input); setSimScore(null) }}
                 >
-                  Reset
+                  Atur Ulang
                 </button>
               </div>
             </div>
@@ -200,7 +206,7 @@ export default function WhatIf() {
           {/* Baseline */}
           <div className="card bg-base-200 shadow-sm">
             <div className="card-body items-center text-center py-5">
-              <div className="text-xs text-base-content/50 uppercase tracking-wider">Baseline Score</div>
+              <div className="text-xs text-base-content/50 uppercase tracking-wider">Skor Dasar</div>
               <div className="text-3xl font-extrabold mt-1">{baselineScore?.toFixed(1)}</div>
             </div>
           </div>
@@ -209,10 +215,10 @@ export default function WhatIf() {
           {simScore !== null && (
             <div className={`card shadow-md ${diff >= 0 ? 'bg-success/10 border border-success/30' : 'bg-error/10 border border-error/30'}`}>
               <div className="card-body items-center text-center py-5 gap-2">
-                <div className="text-xs uppercase tracking-wider opacity-70">Simulated Score</div>
+                <div className="text-xs uppercase tracking-wider opacity-70">Skor Simulasi</div>
                 <div className="text-4xl font-extrabold">{simScore.toFixed(1)}</div>
                 <div className={`badge badge-lg font-bold ${diff >= 0 ? 'badge-success' : 'badge-error'}`}>
-                  {diff >= 0 ? "+" : ""}{diff.toFixed(2)} pts
+                  {diff >= 0 ? "+" : ""}{diff.toFixed(2)} poin
                 </div>
               </div>
             </div>
@@ -229,7 +235,7 @@ export default function WhatIf() {
             <div className="card bg-base-200 shadow-sm">
               <div className="card-body items-center text-center py-10">
                 <div className="text-4xl mb-2">🎯</div>
-                <p className="text-sm text-base-content/50">Adjust parameters and click <strong>Run Simulation</strong> to see the impact.</p>
+                <p className="text-sm text-base-content/50">Sesuaikan parameter dan klik <strong>Jalankan Simulasi</strong> untuk melihat dampaknya.</p>
               </div>
             </div>
           )}
