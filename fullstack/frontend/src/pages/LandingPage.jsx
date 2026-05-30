@@ -40,26 +40,26 @@ const IconMenuBar = () => (
 
 // ── Data ───────────────────────────────────────────────────────────────────
 const features = [
-  { icon: <IconChart />, title: "Academic Score Prediction", desc: "Leverage machine learning algorithms to accurately predict student performance and identify potential academic outcomes before they happen." },
-  { icon: <IconShield />, title: "Risk Classification", desc: "Automatically identify at-risk students using advanced analytics and provide early intervention strategies to prevent academic failure." },
-  { icon: <IconSparkles />, title: "AI Recommendations", desc: "Receive personalized study recommendations and learning paths tailored to each student's unique needs and learning style." },
-  { icon: <IconBeaker />, title: "What-If Simulation", desc: "Run hypothetical scenarios to understand how different variables affect academic performance and make data-driven decisions." },
-  { icon: <IconChart />, title: "Learning Analytics Dashboard", desc: "Comprehensive visual analytics that transform complex educational data into actionable insights and easy-to-understand reports." },
-  { icon: <IconUsers />, title: "Collaborative Insights", desc: "Enable educators, administrators, and students to collaborate effectively with shared insights and transparent progress tracking." },
+  { icon: <IconChart />, title: "Prediksi Skor Akademik", desc: "Gunakan machine learning untuk memprediksi performa siswa secara akurat dan mengenali kemungkinan hasil akademik sejak dini." },
+  { icon: <IconShield />, title: "Klasifikasi Risiko", desc: "Identifikasi siswa berisiko secara otomatis dengan analitik canggih dan dukung intervensi lebih cepat." },
+  { icon: <IconSparkles />, title: "Rekomendasi AI", desc: "Dapatkan rekomendasi belajar yang dipersonalisasi sesuai kebutuhan dan gaya belajar setiap siswa." },
+  { icon: <IconBeaker />, title: "Simulasi What-If", desc: "Jalankan skenario hipotetik untuk melihat bagaimana variabel berbeda mempengaruhi performa akademik." },
+  { icon: <IconChart />, title: "Dashboard Analitik", desc: "Visualisasi data pendidikan yang lengkap untuk diubah menjadi wawasan nyata dan mudah dipahami." },
+  { icon: <IconUsers />, title: "Kolaborasi Tim", desc: "Dukung kolaborasi antara guru, administrator, dan siswa dengan wawasan yang transparan dan mudah dibagikan." },
 ];
 
 const steps = [
-  { num: "1", title: "Data Integration", desc: "Seamlessly connect your existing educational systems and import student data, assignments, and performance metrics." },
-  { num: "2", title: "AI Analysis", desc: "Our advanced machine learning algorithms analyze patterns, predict outcomes, and identify at-risk students automatically." },
-  { num: "3", title: "Actionable Insights", desc: "Access comprehensive dashboards with personalized recommendations and intervention strategies to improve outcomes." },
+  { num: "1", title: "Integrasi Data", desc: "Sambungkan sistem pendidikan Anda dan impor data siswa, tugas, serta metrik performa secara mulus, sesuaikan dengan realita proyek saat ini." },
+  { num: "2", title: "Analisis AI", desc: "Algoritme machine learning kami menganalisis pola, memprediksi hasil, dan mengenali siswa berisiko secara otomatis." },
+  { num: "3", title: "Wawasan yang Dapat Ditindaklanjuti", desc: "Akses dashboard komprehensif dengan rekomendasi personalisasi dan strategi intervensi untuk hasil yang lebih baik." },
 ];
 
-const navLinks = ["Features", "How It Works", "Dashboard", "About"];
+const navLinks = ["Fitur", "Cara Kerja", "Dashboard", "Tentang"];
 
 const footerLinks = {
-  Product: ["Features", "Pricing", "API", "Integrations"],
-  Company: ["About", "Blog", "Careers", "Contact"],
-  Support: ["Help Center", "Documentation", "Status", "Security"],
+  Produk: ["Fitur", "Harga", "API", "Integrasi"],
+  Perusahaan: ["Tentang", "Blog", "Karir", "Kontak"],
+  Dukungan: ["Pusat Bantuan", "Dokumentasi", "Status", "Keamanan"],
 };
 
 // ── Components ─────────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ function Navbar() {
     <nav className="sticky top-0 z-50 bg-base-100/80 backdrop-blur border-b border-base-200">
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
-        <a href="#" className="text-xl font-extrabold tracking-tight text-primary">EduTrack AI</a>
+        <a href="/" className="text-xl font-extrabold tracking-tight text-primary">EduTrack AI</a>
 
         {/* Desktop nav links */}
         <ul className="hidden lg:flex gap-1">
@@ -82,12 +82,40 @@ function Navbar() {
           ))}
         </ul>
 
+        {/* Mobile menu toggle */}
+        <button
+          className="btn btn-ghost btn-square lg:hidden"
+          onClick={() => setOpen((prev) => !prev)}
+          aria-label="Toggle menu"
+        >
+          <IconMenuBar />
+        </button>
+
         {/* Desktop auth buttons */}
-        <div className="flex gap-2">
+        <div className="hidden sm:flex gap-2">
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/signin')}>Sign In</button>
           <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>Get Started</button>
         </div>
       </div>
+
+      {/* Mobile nav links */}
+      {open && (
+        <div className="lg:hidden bg-base-100 border-t border-base-200">
+          <ul className="flex flex-col gap-1 px-4 py-3">
+            {navLinks.map(link => (
+              <li key={link}>
+                <a
+                  href={`#${link.toLowerCase().replace(/ /g, "-")}`}
+                  className="block rounded-lg px-3 py-2 text-sm text-base-content hover:bg-base-200"
+                  onClick={() => setOpen(false)}
+                >
+                  {link}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 }
@@ -95,32 +123,23 @@ function Navbar() {
 function HeroSection() {
   const navigate = useNavigate()
   return (
-    <section id="features" className="min-h-[90vh] flex items-center bg-linear-to-br from-base-100 to-base-200">
+    <section id="hero" className="min-h-[90vh] flex items-center bg-linear-to-br from-base-100 to-base-200">
       <div className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
         {/* Teks kiri */}
         <div className="flex flex-col gap-6">
-          <div className="badge badge-primary badge-outline font-semibold">AI-Powered Platform</div>
+          <div className="badge badge-primary badge-outline font-semibold">Platform Berbasis AI</div>
           <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight">
-            Analyze Your Academic Performance with <span className="text-primary">AI</span>
+            Analisis Performa Akademik Anda dengan <span className="text-primary">AI</span>
           </h1>
           <p className="text-base-content/70 text-lg leading-relaxed">
-            Transform educational outcomes with machine learning-powered insights. Predict student performance, identify at-risk learners, and deliver personalized recommendations that drive academic success.
+            Ubah hasil pendidikan dengan wawasan dari machine learning. Prediksi performa siswa, identifikasi risiko, dan berikan rekomendasi yang dipersonalisasi untuk kesuksesan akademik.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <button className="btn btn-primary" onClick={() => navigate('/register')}>Get Started Free</button>
-            <button className="btn btn-outline">See Demo</button>
-          </div>
-          {/* Stats */}
-          <div className="flex gap-8 pt-2">
-            <p className="text-sm">No credit card required</p>
-            <p className="text-sm">14-day free trial</p>
-          </div>
         </div>
 
         {/* Placeholder gambar kanan */}
         <div className="flex justify-center">
           <div className="w-full max-w-md aspect-square rounded-3xl bg-base-300 flex items-center justify-center shadow-xl">
-            <span className="text-base-content/30 text-sm"><img src="analyticspreview.png" alt="Analytics Preview" /></span>
+            <span className="text-base-content/30 text-sm"><img src="analyticspreview.png" alt="Pratinjau analitik" /></span>
           </div>
         </div>
       </div>
@@ -130,12 +149,12 @@ function HeroSection() {
 
 function FeaturesSection() {
   return (
-    <section id="how-it-works" className="py-24 bg-base-100">
+    <section id="fitur" className="py-24 bg-base-100">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Powerful Features for Educational Excellence</h2>
+          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Fitur Unggulan</h2>
           <p className="text-base-content/60 max-w-xl mx-auto">
-            Our AI-powered platform provides comprehensive insights and tools to enhance academic outcomes and student success.
+            Platform AI kami memberikan wawasan lengkap dan alat untuk meningkatkan hasil pembelajaran dan keberhasilan siswa.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,12 +175,12 @@ function FeaturesSection() {
 
 function HowItWorksSection() {
   return (
-    <section id="dashboard" className="py-24 bg-base-200">
+    <section id="cara-kerja" className="py-24 bg-base-200">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">How EduTrack AI Works</h2>
+          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Cara Kerja EduTrack AI</h2>
           <p className="text-base-content/60 max-w-xl mx-auto">
-            Our intuitive three-step process transforms raw educational data into actionable insights that drive academic success.
+            Proses tiga langkah kami mengubah data pendidikan mentah menjadi wawasan yang dapat ditindaklanjuti untuk mendorong kesuksesan akademik.
           </p>
         </div>
         <div className="grid lg:grid-cols-3 gap-8">
@@ -181,46 +200,43 @@ function HowItWorksSection() {
 }
 
 function DashboardPreviewSection() {
+  const navigate = useNavigate()
   return (
-    <section id="about" className="py-24 bg-base-100">
+    <section id="dashboard" className="py-24 bg-base-100">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Experience the Dashboard</h2>
+          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Coba Dashboard</h2>
           <p className="text-base-content/60 max-w-xl mx-auto">
-            Get a glimpse of our comprehensive analytics platform designed to provide clear insights and drive educational excellence.
+            Lihat tampilan panel Overview dan Simulasi What-If yang membantu siswa dan pendidik mengambil keputusan berdasarkan data.
           </p>
         </div>
-        {/* Placeholder dashboard */}
-        <div className="rounded-3xl bg-base-200 shadow-xl overflow-hidden">
-          {/* Fake browser bar */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-base-300">
-            <div className="w-3 h-3 rounded-full bg-error opacity-60" />
-            <div className="w-3 h-3 rounded-full bg-warning opacity-60" />
-            <div className="w-3 h-3 rounded-full bg-success opacity-60" />
-            <div className="flex-1 mx-4 h-5 rounded bg-base-100 opacity-40" />
-          </div>
-          {/* Placeholder content */}
-          <div className="p-8 grid sm:grid-cols-2 gap-6 min-h-64">
-            {[
-              { label: "Real-time Analytics", desc: "Monitor student performance with live data updates and trend analysis." },
-              { label: "AI Predictions", desc: "Advanced machine learning provides accurate performance forecasts." },
-            ].map(({ label, desc }) => (
-              <div key={label} className="card bg-base-100">
-                <div className="card-body">
-                  <div className="text-primary font-bold">{label}</div>
-                  <p className="text-sm text-base-content/60">{desc}</p>
-                  <div className="mt-4 space-y-2">
-                    {[80, 60, 90].map((w, i) => (
-                      <div key={i} className="h-2 rounded-full bg-base-300 overflow-hidden">
-                        <div className="h-full bg-primary rounded-full" style={{ width: `${w}%` }} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="card bg-base-200 shadow-xl overflow-hidden">
+            <div className="card-body p-6">
+              <div className="font-bold text-lg mb-3">Dashboard Overview</div>
+              <div className="rounded-3xl overflow-hidden border border-base-300">
+                <img src="/overview-screenshot.jpg" alt="Screenshot Dashboard Overview" className="w-full object-cover" />
               </div>
-            ))}
+              <p className="text-sm text-base-content/60 mt-4">
+                Ringkasan kinerja, skor prediksi, tren, dan rekomendasi AI untuk membantu siswa memahami kemajuan mereka.
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-base-200 shadow-xl overflow-hidden">
+            <div className="card-body p-6">
+              <div className="font-bold text-lg mb-3">Simulasi What-If</div>
+              <div className="rounded-3xl overflow-hidden border border-base-300">
+                <img src="/whatif-screenshot.jpg" alt="Screenshot Simulasi What-If" className="w-full object-cover" />
+              </div>
+              <p className="text-sm text-base-content/60 mt-4">
+                Simulasikan perubahan parameter belajar untuk melihat dampaknya terhadap skor akademik secara instan.
+              </p>
+            </div>
           </div>
         </div>
+
       </div>
     </section>
   );
@@ -231,14 +247,11 @@ function CTASection() {
   return (
     <section className="py-24 bg-primary text-primary-content">
       <div className="max-w-2xl mx-auto px-6 text-center flex flex-col gap-6">
-        <h2 className="text-3xl lg:text-4xl font-extrabold">Ready to Transform Education with AI?</h2>
+        <h2 className="text-3xl lg:text-4xl font-extrabold">Siap Mengubah Pendidikan dengan AI?</h2>
         <p className="opacity-80 text-lg">
-          Join thousands of educators who are already using EduTrack AI to improve student outcomes and drive academic success.
+          Bergabunglah dengan pendidik yang sudah menggunakan EduTrack AI untuk meningkatkan hasil siswa dan mencapai kesuksesan akademik.
         </p>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <button className="btn bg-white text-primary hover:bg-white/90 border-none" onClick={() => navigate('/signin')}>Get Started Free</button>
-          <button className="btn btn-outline border-white text-white hover:bg-white hover:text-primary">Learn More</button>
-        </div>
+        <button className="btn bg-white text-primary hover:bg-white/80 border-none" onClick={() => navigate('/signin')}>Mulai Sekarang</button>
       </div>
     </section>
   );
@@ -246,14 +259,14 @@ function CTASection() {
 
 function Footer() {
   return (
-    <footer className="bg-base-200 pt-16 pb-8">
+    <footer id="tentang" className="bg-base-200 pt-16 pb-8">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="flex flex-col gap-3">
             <span className="text-xl font-extrabold text-primary">EduTrack AI</span>
             <p className="text-sm text-base-content/60 leading-relaxed">
-              Empowering educators with AI-driven insights to transform academic outcomes and student success.
+              Memberdayakan pendidik dengan wawasan berbasis AI untuk mengubah hasil akademik dan kesuksesan siswa.
             </p>
           </div>
           {/* Links */}

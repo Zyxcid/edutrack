@@ -4,25 +4,25 @@ import { predict } from "../services/api";
 
 // ── Initial Form State ─────────────────────────────────────────────────────
 const initialForm = {
-  // Step 1 - Personal
+  // Step 1 - Pribadi
   Gender: "Male",
   Parental_Education_Level: "High School",
   Family_Income: "Medium",
   Learning_Disabilities: "No",
   Distance_from_Home: "Near",
-  // Step 2 - Academic
+  // Step 2 - Akademik
   Previous_Scores: "",
   Attendance: "",
   School_Type: "Public",
   Teacher_Quality: "Medium",
   Access_to_Resources: "Medium",
-  // Step 3 - Study Habits
+  // Step 3 - Kebiasaan Belajar
   Hours_Studied: "",
   Sleep_Hours: "",
   Tutoring_Sessions: "",
   Motivation_Level: "Medium",
   Extracurricular_Activities: "No",
-  // Step 4 - Environment
+  // Step 4 - Lingkungan
   Parental_Involvement: "Medium",
   Internet_Access: "Yes",
   Peer_Influence: "Neutral",
@@ -31,10 +31,10 @@ const initialForm = {
 
 // ── Step Config ────────────────────────────────────────────────────────────
 const steps = [
-  { label: "Personal" },
-  { label: "Academic" },
-  { label: "Study Habits" },
-  { label: "Environment" },
+  { label: "Pribadi" },
+  { label: "Akademik" },
+  { label: "Kebiasaan Belajar" },
+  { label: "Lingkungan" },
 ];
 
 // ── Reusable Field Components ──────────────────────────────────────────────
@@ -46,7 +46,9 @@ function SelectField({ label, name, value, onChange, options }) {
       </div>
       <select name={name} value={value} onChange={onChange} className="select select-bordered w-full">
         {options.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
+          <option key={typeof opt === "string" ? opt : opt.value} value={typeof opt === "string" ? opt : opt.value}>
+            {typeof opt === "string" ? opt : opt.label}
+          </option>
         ))}
       </select>
     </label>
@@ -77,16 +79,16 @@ function NumberField({ label, name, value, onChange, placeholder, min, max }) {
 function Step1({ form, onChange }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <SelectField label="Gender" name="Gender" value={form.Gender} onChange={onChange}
-        options={["Male", "Female"]} />
-      <SelectField label="Parental Education Level" name="Parental_Education_Level" value={form.Parental_Education_Level} onChange={onChange}
-        options={["High School", "College", "Postgraduate"]} />
-      <SelectField label="Family Income" name="Family_Income" value={form.Family_Income} onChange={onChange}
-        options={["Low", "Medium", "High"]} />
-      <SelectField label="Learning Disabilities" name="Learning_Disabilities" value={form.Learning_Disabilities} onChange={onChange}
-        options={["Yes", "No"]} />
-      <SelectField label="Distance from Home" name="Distance_from_Home" value={form.Distance_from_Home} onChange={onChange}
-        options={["Near", "Moderate", "Far"]} />
+      <SelectField label="Jenis Kelamin" name="Gender" value={form.Gender} onChange={onChange}
+        options={[{ value: "Male", label: "Laki-laki" }, { value: "Female", label: "Perempuan" }]} />
+      <SelectField label="Pendidikan Orang Tua" name="Parental_Education_Level" value={form.Parental_Education_Level} onChange={onChange}
+        options={[{ value: "High School", label: "SMA" }, { value: "College", label: "Perguruan Tinggi" }, { value: "Postgraduate", label: "Pascasarjana" }]} />
+      <SelectField label="Pendapatan Keluarga" name="Family_Income" value={form.Family_Income} onChange={onChange}
+        options={[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }]} />
+      <SelectField label="Gangguan Belajar" name="Learning_Disabilities" value={form.Learning_Disabilities} onChange={onChange}
+        options={[{ value: "Yes", label: "Ya" }, { value: "No", label: "Tidak" }]} />
+      <SelectField label="Jarak dari Rumah" name="Distance_from_Home" value={form.Distance_from_Home} onChange={onChange}
+        options={[{ value: "Near", label: "Dekat" }, { value: "Moderate", label: "Sedang" }, { value: "Far", label: "Jauh" }]} />
     </div>
   );
 }
@@ -94,16 +96,16 @@ function Step1({ form, onChange }) {
 function Step2({ form, onChange }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <NumberField label="Previous Scores (0-100)" name="Previous_Scores" value={form.Previous_Scores}
-        onChange={onChange} placeholder="e.g. 75" min={0} max={100} />
-      <NumberField label="Attendance (%)" name="Attendance" value={form.Attendance}
-        onChange={onChange} placeholder="e.g. 85" min={0} max={100} />
-      <SelectField label="School Type" name="School_Type" value={form.School_Type} onChange={onChange}
-        options={["Public", "Private"]} />
-      <SelectField label="Teacher Quality" name="Teacher_Quality" value={form.Teacher_Quality} onChange={onChange}
-        options={["Low", "Medium", "High"]} />
-      <SelectField label="Access to Resources" name="Access_to_Resources" value={form.Access_to_Resources} onChange={onChange}
-        options={["Low", "Medium", "High"]} />
+      <NumberField label="Skor Sebelumnya (0-100)" name="Previous_Scores" value={form.Previous_Scores}
+        onChange={onChange} placeholder="mis. 75" min={0} max={100} />
+      <NumberField label="Kehadiran (%)" name="Attendance" value={form.Attendance}
+        onChange={onChange} placeholder="mis. 85" min={0} max={100} />
+      <SelectField label="Jenis Sekolah" name="School_Type" value={form.School_Type} onChange={onChange}
+        options={[{ value: "Public", label: "Negeri" }, { value: "Private", label: "Swasta" }]} />
+      <SelectField label="Kualitas Guru" name="Teacher_Quality" value={form.Teacher_Quality} onChange={onChange}
+        options={[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }]} />
+      <SelectField label="Akses Sumber Daya" name="Access_to_Resources" value={form.Access_to_Resources} onChange={onChange}
+        options={[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }]} />
     </div>
   );
 }
@@ -111,16 +113,16 @@ function Step2({ form, onChange }) {
 function Step3({ form, onChange }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <NumberField label="Hours Studied per Week" name="Hours_Studied" value={form.Hours_Studied}
-        onChange={onChange} placeholder="e.g. 15" min={0} max={100} />
-      <NumberField label="Sleep Hours per Night" name="Sleep_Hours" value={form.Sleep_Hours}
-        onChange={onChange} placeholder="e.g. 7" min={0} max={24} />
-      <NumberField label="Tutoring Sessions per Month" name="Tutoring_Sessions" value={form.Tutoring_Sessions}
-        onChange={onChange} placeholder="e.g. 2" min={0} max={30} />
-      <SelectField label="Motivation Level" name="Motivation_Level" value={form.Motivation_Level} onChange={onChange}
-        options={["Low", "Medium", "High"]} />
-      <SelectField label="Extracurricular Activities" name="Extracurricular_Activities" value={form.Extracurricular_Activities} onChange={onChange}
-        options={["Yes", "No"]} />
+      <NumberField label="Jam Belajar per Minggu" name="Hours_Studied" value={form.Hours_Studied}
+        onChange={onChange} placeholder="mis. 15" min={0} max={100} />
+      <NumberField label="Jam Tidur per Malam" name="Sleep_Hours" value={form.Sleep_Hours}
+        onChange={onChange} placeholder="mis. 7" min={0} max={24} />
+      <NumberField label="Sesi Bimbingan per Bulan" name="Tutoring_Sessions" value={form.Tutoring_Sessions}
+        onChange={onChange} placeholder="mis. 2" min={0} max={30} />
+      <SelectField label="Tingkat Motivasi" name="Motivation_Level" value={form.Motivation_Level} onChange={onChange}
+        options={[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }]} />
+      <SelectField label="Kegiatan Ekstrakurikuler" name="Extracurricular_Activities" value={form.Extracurricular_Activities} onChange={onChange}
+        options={[{ value: "Yes", label: "Ya" }, { value: "No", label: "Tidak" }]} />
     </div>
   );
 }
@@ -128,14 +130,14 @@ function Step3({ form, onChange }) {
 function Step4({ form, onChange }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <SelectField label="Parental Involvement" name="Parental_Involvement" value={form.Parental_Involvement} onChange={onChange}
-        options={["Low", "Medium", "High"]} />
-      <SelectField label="Internet Access" name="Internet_Access" value={form.Internet_Access} onChange={onChange}
-        options={["Yes", "No"]} />
-      <SelectField label="Peer Influence" name="Peer_Influence" value={form.Peer_Influence} onChange={onChange}
-        options={["Positive", "Neutral", "Negative"]} />
-      <NumberField label="Physical Activity (hours/week)" name="Physical_Activity" value={form.Physical_Activity}
-        onChange={onChange} placeholder="e.g. 3" min={0} max={30} />
+      <SelectField label="Keterlibatan Orang Tua" name="Parental_Involvement" value={form.Parental_Involvement} onChange={onChange}
+        options={[{ value: "Low", label: "Rendah" }, { value: "Medium", label: "Sedang" }, { value: "High", label: "Tinggi" }]} />
+      <SelectField label="Akses Internet" name="Internet_Access" value={form.Internet_Access} onChange={onChange}
+        options={[{ value: "Yes", label: "Ya" }, { value: "No", label: "Tidak" }]} />
+      <SelectField label="Pengaruh Teman Sebaya" name="Peer_Influence" value={form.Peer_Influence} onChange={onChange}
+        options={[{ value: "Positive", label: "Positif" }, { value: "Neutral", label: "Netral" }, { value: "Negative", label: "Negatif" }]} />
+      <NumberField label="Aktivitas Fisik (jam/minggu)" name="Physical_Activity" value={form.Physical_Activity}
+        onChange={onChange} placeholder="mis. 3" min={0} max={30} />
     </div>
   );
 }
@@ -143,15 +145,15 @@ function Step4({ form, onChange }) {
 // ── Validation ─────────────────────────────────────────────────────────────
 function validateStep(step, form) {
   if (step === 1) {
-    if (!form.Previous_Scores || !form.Attendance) return "Please fill all required fields."
-    if (form.Previous_Scores < 0 || form.Previous_Scores > 100) return "Previous Scores must be between 0-100."
-    if (form.Attendance < 0 || form.Attendance > 100) return "Attendance must be between 0-100."
+    if (!form.Previous_Scores || !form.Attendance) return "Harap isi semua field yang diperlukan."
+    if (form.Previous_Scores < 0 || form.Previous_Scores > 100) return "Skor sebelumnya harus berada di antara 0-100."
+    if (form.Attendance < 0 || form.Attendance > 100) return "Kehadiran harus berada di antara 0-100."
   }
   if (step === 2) {
-    if (!form.Hours_Studied || !form.Sleep_Hours || !form.Tutoring_Sessions) return "Please fill all required fields."
+    if (!form.Hours_Studied || !form.Sleep_Hours || !form.Tutoring_Sessions) return "Harap isi semua field yang diperlukan."
   }
   if (step === 3) {
-    if (!form.Physical_Activity) return "Please fill all required fields."
+    if (!form.Physical_Activity) return "Harap isi semua field yang diperlukan."
   }
   return null
 }
@@ -203,7 +205,7 @@ export default function PredictPage() {
       navigate('/dashboard');
 
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+      setError(err.response?.data?.message || "Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -226,9 +228,9 @@ export default function PredictPage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-extrabold">Student Performance Analysis</h1>
-          <p className="text-base-content/50 text-sm mt-1">
-            Fill in the student data to get AI-powered predictions and recommendations.
+      <h1 className="text-2xl font-extrabold">Analisis Performa Siswa</h1>
+      <p className="text-base-content/50 text-sm mt-1">
+            Isi data siswa untuk mendapatkan prediksi dan rekomendasi berbasis AI.
           </p>
         </div>
 
@@ -247,7 +249,7 @@ export default function PredictPage() {
 
             {/* Step Title */}
             <h2 className="text-lg font-bold">
-              Step {currentStep + 1}: {steps[currentStep].label} Information
+              Langkah {currentStep + 1}: Informasi {steps[currentStep].label}
             </h2>
 
             {/* Step Form */}
@@ -267,12 +269,12 @@ export default function PredictPage() {
                 onClick={handleBack}
                 disabled={currentStep === 0}
               >
-                ← Back
+                ← Kembali
               </button>
 
               {currentStep < steps.length - 1 ? (
                 <button className="btn btn-primary" onClick={handleNext}>
-                  Next →
+                  Lanjutkan →
                 </button>
               ) : (
                 <button
@@ -282,7 +284,7 @@ export default function PredictPage() {
                 >
                   {loading
                     ? <span className="loading loading-spinner loading-sm" />
-                    : "Predict Now 🎯"}
+                    : "Prediksi Sekarang 🎯"}
                 </button>
               )}
             </div>
@@ -292,7 +294,7 @@ export default function PredictPage() {
 
         {/* Step counter */}
         <p className="text-center text-sm text-base-content/40 mt-4">
-          Step {currentStep + 1} of {steps.length}
+          Langkah {currentStep + 1} dari {steps.length}
         </p>
 
       </div>

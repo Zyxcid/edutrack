@@ -29,9 +29,9 @@ const IconMenu = () => (
 
 // ── Menu Config ────────────────────────────────────────────────────────────
 const menuItems = [
-  { label: "Overview", icon: <IconOverview />, path: "/dashboard" },
+  { label: "Ikhtisar", icon: <IconOverview />, path: "/dashboard" },
   { label: "What-If", icon: <IconBeaker />, path: "/dashboard/whatif" },
-  { label: "Profile", icon: <IconUser />, path: "/dashboard/profile" },
+  { label: "Profil", icon: <IconUser />, path: "/dashboard/profile" },
 ]
 
 // ── Sidebar Content ────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ function SidebarContent({ onNavigate }) {
 
       {/* Menu */}
       <ul className="menu w-full grow px-2 py-4 gap-1">
-        <li className="menu-title text-xs uppercase tracking-widest opacity-50 px-2 mb-1">Analytics</li>
+        <li className="menu-title text-xs uppercase tracking-widest opacity-50 px-2 mb-1">Analitik</li>
         {menuItems.map(({ label, icon, path }) => (
           <li key={label}>
             <button
@@ -72,7 +72,7 @@ function SidebarContent({ onNavigate }) {
       {/* Logout */}
       <div className="p-4 border-t border-base-300">
         <button onClick={handleLogout} className="btn btn-ghost btn-sm w-full justify-start gap-2 text-error">
-          <IconLogout /> Logout
+          <IconLogout /> Keluar
         </button>
       </div>
     </div>
@@ -98,7 +98,7 @@ function Navbar({ children }) {
           </label>
           {/* Title */}
           <div className="flex-1 px-4 font-semibold">
-            {activeMenu?.label ?? "Dashboard"}
+            {activeMenu?.label ?? "Dasbor"}
           </div>
           {/* User info */}
           <div className="px-4">

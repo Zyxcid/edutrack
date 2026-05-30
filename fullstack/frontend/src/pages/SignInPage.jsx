@@ -18,29 +18,29 @@ export default function SignInPage() {
     // ── Validasi Frontend ──
     if (isSignIn) {
       if (!form.email || !form.password) {
-        setError("Email and password are required")
+        setError("Email dan kata sandi wajib diisi")
         return
       }
     } else {
       if (!form.name || !form.email || !form.password || !form.confirm) {
-        setError("All fields are required")
+        setError("Semua kolom wajib diisi")
         return
       }
       if (form.name.trim().length < 2) {
-        setError("Name must be at least 2 characters")
+        setError("Nama harus terdiri dari minimal 2 karakter")
         return
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(form.email)) {
-        setError("Invalid email format")
+        setError("Format email tidak valid")
         return
       }
       if (form.password.length < 8) {
-        setError("Password must be at least 8 characters")
+        setError("Kata sandi harus memiliki minimal 8 karakter")
         return
       }
       if (form.password !== form.confirm) {
-        setError("Passwords do not match")
+        setError("Kata sandi tidak cocok")
         return
       }
     }
@@ -87,15 +87,15 @@ export default function SignInPage() {
         {/* Tengah */}
         <div className="flex flex-col gap-6">
           <div className="text-4xl font-extrabold leading-snug">
-            Transform Education <br /> with AI Insights
+            Transformasi Pendidikan <br /> dengan Wawasan AI
           </div>
           <p className="opacity-75 text-lg leading-relaxed max-w-sm">
-            Predict student performance, identify at-risk learners, and deliver personalized recommendations.
+            Prediksi performa siswa, identifikasi siswa berisiko, dan berikan rekomendasi yang dipersonalisasi.
           </p>
 
           {/* Stats */}
           <div className="flex gap-10 pt-4">
-            {[["95%", "Accuracy"], ["10K+", "Students"], ["300+", "Institutions"]].map(([val, label]) => (
+            {[["95%", "Akurasi"], ["10K+", "Siswa"], ["300+", "Institusi"]].map(([val, label]) => (
               <div key={label}>
                 <div className="text-3xl font-extrabold">{val}</div>
                 <div className="text-sm opacity-60">{label}</div>
@@ -121,12 +121,12 @@ export default function SignInPage() {
           {/* Header */}
           <div>
             <h1 className="text-2xl font-extrabold">
-              {isSignIn ? "Welcome back" : "Create an account"}
+              {isSignIn ? "Selamat datang kembali" : "Buat akun"}
             </h1>
             <p className="text-base-content/50 text-sm mt-1">
               {isSignIn
-                ? "Sign in to your EduTrack account"
-                : "Start your journey with EduTrack AI"}
+                ? "Masuk ke akun EduTrack Anda"
+                : "Mulai perjalanan Anda dengan EduTrack AI"}
             </p>
           </div>
 
@@ -137,12 +137,12 @@ export default function SignInPage() {
             {!isSignIn && (
               <label className="form-control">
                 <div className="label pb-1">
-                  <span className="label-text text-sm font-medium">Full Name</span>
+                  <span className="label-text text-sm font-medium">Nama Lengkap</span>
                 </div>
                 <input
                   type="text"
                   name="name"
-                  placeholder="Your full name"
+                  placeholder="Nama lengkap Anda"
                   className="input input-bordered w-full"
                   value={form.name}
                   onChange={handleChange}
@@ -158,7 +158,7 @@ export default function SignInPage() {
               <input
                 type="email"
                 name="email"
-                placeholder="you@example.com"
+                placeholder="contoh@domain.com"
                 className="input input-bordered w-full"
                 value={form.email}
                 onChange={handleChange}
@@ -168,9 +168,9 @@ export default function SignInPage() {
             {/* Password */}
             <label className="form-control">
               <div className="label pb-1">
-                <span className="label-text text-sm font-medium">Password</span>
+                <span className="label-text text-sm font-medium">Kata Sandi</span>
                 {isSignIn && (
-                  <a href="#" className="label-text-alt text-primary hover:underline">Forgot password?</a>
+                  <a href="#" className="label-text-alt text-primary hover:underline">Lupa kata sandi?</a>
                 )}
               </div>
               <input
@@ -187,7 +187,7 @@ export default function SignInPage() {
             {!isSignIn && (
               <label className="form-control">
                 <div className="label pb-1">
-                  <span className="label-text text-sm font-medium">Confirm Password</span>
+                  <span className="label-text text-sm font-medium">Konfirmasi Kata Sandi</span>
                 </div>
                 <input
                   type="password"
@@ -212,18 +212,18 @@ export default function SignInPage() {
               onClick={handleSubmit}
               disabled={loading}
             >
-              {loading ? <span className="loading loading-spinner loading-sm" /> : isSignIn ? "Sign In" : "Create Account"}
+              {loading ? <span className="loading loading-spinner loading-sm" /> : isSignIn ? "Masuk" : "Buat Akun"}
             </button>
           </div>
 
           {/* Toggle Sign In / Register */}
           <p className="text-center text-sm text-base-content/50">
-            {isSignIn ? "Don't have an account?" : "Already have an account?"}{" "}
+            {isSignIn ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
             <button
               className="text-primary font-semibold hover:underline"
               onClick={() => setIsSignIn(!isSignIn)}
             >
-              {isSignIn ? "Get Started" : "Sign In"}
+              {isSignIn ? "Daftar" : "Masuk"}
             </button>
           </p>
 
