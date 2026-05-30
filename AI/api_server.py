@@ -3,11 +3,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 from src.inference.predict import load_inference_components, preprocess_input, predict
-import google.generativeai as genai
+from google import genai
 
 # Configure Google Gemini API Key
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBoNKklA2iBy1XOQgqWmi68WDrMZjp5gBs")
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 app = FastAPI(title="Exam Score Predictor AI")
 
@@ -216,8 +216,10 @@ def recommend(request: PredictionRequest):
             Tulis penjelasan dengan format Markdown yang rapi (gunakan emoji jika sesuai).
             """
             
-            gemini_model = genai.GenerativeModel("gemini-1.5-flash")
-            response = gemini_model.generate_content(prompt)
+            response = client.models.generate_content(
+                model="gemini-1.5-flash",
+                contents=prompt
+            )
             generative_explanation = response.text.strip()
         except Exception as gemini_err:
             generative_explanation = f"Gagal menghasilkan penjelasan AI Generatif: {str(gemini_err)}"
@@ -263,8 +265,10 @@ def chat_advisor(request: ChatRequest):
         3. Format tanggapan Anda menggunakan Markdown agar mudah dibaca di aplikasi (gunakan bullet points, bold text, dll.).
         """
         
-        gemini_model = genai.GenerativeModel("gemini-1.5-flash")
-        response = gemini_model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt
+        )
         
         return {
             "status": "success",

@@ -5,4 +5,7 @@ fastapi
 uvicorn
 scikit-learn==1.6.1
 joblib
-google-generativeai
+google-genai
+google-cloud-storage
+google-cloud-aiplatform
+google-auth
